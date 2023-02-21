@@ -24,7 +24,7 @@
     <ProjectGuid>{e517ae55-592f-479c-9fb0-01e51a090502}</ProjectGuid>
     <RootNamespace>RenderPipeline</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>RenderPipelineExample</ProjectName>
+    <ProjectName>DX11_RenderPipeline_Example</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
