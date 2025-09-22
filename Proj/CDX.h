@@ -29,7 +29,9 @@ public:
 	CDX(const Vec2& _WinSize);
 	~CDX();
 	
-
+public:
+	ComPtr<ID3D11Device> get_device() { return Device; };
+	ComPtr<ID3D11DeviceContext> get_context() { return Context; }
 
 //========= DXE ===================
 	void _0_DXInit_DeviceContext();
@@ -41,7 +43,6 @@ public:
 	void _6_DXInit_CreateDefaultGraphicsShader();
 	void _7_DXInit_CreateConstBuffer();
 	void _8_DXInit_CreateMeshes();				//Local Space
-
 
 	void _9_DXLoop_UpdateTime();
 	void _10_DXLoop_UpdateKey();
@@ -151,5 +152,7 @@ public:
 	
 	//Key Manager
 	CKeyMgr* KeyMgr;
+
+	
 };
 

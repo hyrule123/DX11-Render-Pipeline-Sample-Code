@@ -16,6 +16,8 @@
 #include "CTimer.h"
 #include "CKeyMgr.h"
 
+#include <FW1FontWrapper/FW1FontWrapper.h>
+
 CDX::CDX(const Vec2& _WinSize):
     UseQuaternion(false),
     ManualCalculation(false)
