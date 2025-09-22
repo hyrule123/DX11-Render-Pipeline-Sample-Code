@@ -165,7 +165,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CDX.h" />
+    <ClInclude Include="DX11.h" />
     <ClInclude Include="CKeyMgr.h" />
     <ClInclude Include="CTimer.h" />
     <ClInclude Include="global.h" />
@@ -176,7 +176,7 @@
     <ClInclude Include="TextRenderer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CDX.cpp" />
+    <ClCompile Include="DX11.cpp" />
     <ClCompile Include="CKeyMgr.cpp" />
     <ClCompile Include="CTimer.cpp" />
     <ClCompile Include="main.cpp" />

@@ -27,5 +27,6 @@ private:
 	Manager();
 	~Manager();
 
+	
 };
 

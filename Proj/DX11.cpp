@@ -1,4 +1,4 @@
-﻿#include "CDX.h"
+﻿#include "DX11.h"
 
 //Shader Include
 #ifdef _DEBUG
@@ -18,7 +18,7 @@
 
 #include <FW1FontWrapper/FW1FontWrapper.h>
 
-CDX::CDX(const Vec2& _WinSize):
+DX11::DX11(const Vec2& _WinSize):
     UseQuaternion(false),
     ManualCalculation(false)
 {
@@ -45,13 +45,13 @@ CDX::CDX(const Vec2& _WinSize):
     _8_DXInit_CreateMeshes();
 }
 
-CDX::~CDX()
+DX11::~DX11()
 {
     delete KeyMgr;
     delete Timer;
 }
 
-void CDX::_0_DXInit_DeviceContext()
+void DX11::_0_DXInit_DeviceContext()
 {
     int DXFlag = 0;
 #ifdef _DEBUG
@@ -73,7 +73,7 @@ void CDX::_0_DXInit_DeviceContext()
     ));
 }
 
-void CDX::_1_DXInit_CreateSwapChain()
+void DX11::_1_DXInit_CreateSwapChain()
 {
     DXGI_SWAP_CHAIN_DESC Desc = {};
 
@@ -109,7 +109,7 @@ void CDX::_1_DXInit_CreateSwapChain()
     CHKFAIL(DXGIFactory->CreateSwapChain(Device.Get(), &Desc, SwapChain.GetAddressOf()));
 }
 
-void CDX::_2_DXInit_CreateView()
+void DX11::_2_DXInit_CreateView()
 {
     CHKFAIL(SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)RTTex.GetAddressOf()));
 
@@ -146,7 +146,7 @@ void CDX::_2_DXInit_CreateView()
     Context->RSSetViewports(1, &ViewPort);
 }
 
-void CDX::_3_DXInit_CreateInputAssembler()
+void DX11::_3_DXInit_CreateInputAssembler()
 {
     D3D11_INPUT_ELEMENT_DESC IADesc[2] = {};
 
@@ -172,12 +172,12 @@ void CDX::_3_DXInit_CreateInputAssembler()
 }
 
 
-void CDX::_4_DXInit_CreateBlendState()
+void DX11::_4_DXInit_CreateBlendState()
 {
     BSState = nullptr;
 }
 
-void CDX::_5_DXInit_CreateSampler()
+void DX11::_5_DXInit_CreateSampler()
 {
     D3D11_SAMPLER_DESC SamDesc = {};
 
@@ -188,7 +188,7 @@ void CDX::_5_DXInit_CreateSampler()
     Device->CreateSamplerState(&SamDesc, Sampler.GetAddressOf());
 }
 
-void CDX::_6_DXInit_CreateDefaultGraphicsShader()
+void DX11::_6_DXInit_CreateDefaultGraphicsShader()
 {
     //GetModuleFileNameW(0, ProgPath, MAX_PATH);
 
@@ -215,7 +215,7 @@ void CDX::_6_DXInit_CreateDefaultGraphicsShader()
 
 
 
-void CDX::_7_DXInit_CreateConstBuffer()
+void DX11::_7_DXInit_CreateConstBuffer()
 {
     //기본적으로 계산된 WVP Matrix를 보내는 용도로 사용할 상수 버퍼
 
@@ -228,7 +228,7 @@ void CDX::_7_DXInit_CreateConstBuffer()
     CHKFAIL(Device->CreateBuffer(&Desc, nullptr, CB.GetAddressOf()));
 }
 
-void CDX::_8_DXInit_CreateMeshes()
+void DX11::_8_DXInit_CreateMeshes()
 {
     //정점정보 생성
     Vertex v = {};
@@ -377,12 +377,12 @@ void CDX::_8_DXInit_CreateMeshes()
 
 }
 
-void CDX::_9_DXLoop_UpdateTime()
+void DX11::_9_DXLoop_UpdateTime()
 {
     Timer->tick();
 }
 
-void CDX::_10_DXLoop_UpdateKey()
+void DX11::_10_DXLoop_UpdateKey()
 {
     KeyMgr->tick();
 
@@ -409,7 +409,7 @@ void CDX::_10_DXLoop_UpdateKey()
 
 }
 
-void CDX::_11_DXLoop_WorldSpaceTransform()
+void DX11::_11_DXLoop_WorldSpaceTransform()
 {
     //크기
     Matrix matScale = Matrix::CreateScale(CubeScale);
@@ -599,7 +599,7 @@ void CDX::_11_DXLoop_WorldSpaceTransform()
     //}
 }
 
-void CDX::_12_DXLoop_ViewSpaceTransform()
+void DX11::_12_DXLoop_ViewSpaceTransform()
 {
     //ViewMatrix 
     // = (RotationMatrix * TranslationMatrix)^(-1)
@@ -660,7 +660,7 @@ void CDX::_12_DXLoop_ViewSpaceTransform()
     ViewMatrix = CameraTranslationMatrix * matRotInv;
 }
 
-void CDX::_13_DXLoop_ProjectionSpaceTransform()
+void DX11::_13_DXLoop_ProjectionSpaceTransform()
 {
     AspectRatio = vRenderResolution.x / vRenderResolution.y;
     FieldOfView = XM_PI / 3.f;
@@ -671,7 +671,7 @@ void CDX::_13_DXLoop_ProjectionSpaceTransform()
     ProjectionMatrix = XMMatrixPerspectiveFovLH(FieldOfView, AspectRatio, NearPlane, FarPlane);
 }
 
-void CDX::_14_DXLoop_UpdateBuffer()
+void DX11::_14_DXLoop_UpdateBuffer()
 {
     Matrix WorldViewProjectionMatrix = WorldMatrix * ViewMatrix * ProjectionMatrix;
     WorldViewProjectionMatrix = WorldViewProjectionMatrix.Transpose();
@@ -686,7 +686,7 @@ void CDX::_14_DXLoop_UpdateBuffer()
     Context->VSSetConstantBuffers(0, 1, CB.GetAddressOf());
 }
 
-void CDX::_15_DXLoop_SetShader()
+void DX11::_15_DXLoop_SetShader()
 {
     //출력 병합기에 새 렌더타겟을 등록.
     Context->OMSetRenderTargets(1, RTV.GetAddressOf(), DSV.Get());
@@ -703,7 +703,7 @@ void CDX::_15_DXLoop_SetShader()
     Context->PSSetShader(PS.Get(), nullptr, 0);
 }
 
-void CDX::_16_DXLoop_DrawCube()
+void DX11::_16_DXLoop_DrawCube()
 {
     Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     UINT VBStride = sizeof(Vertex);
@@ -714,7 +714,7 @@ void CDX::_16_DXLoop_DrawCube()
     Context->DrawIndexed(36, 0, 0);
 }
 
-void CDX::_17_DXLoop_DrawAxis()
+void DX11::_17_DXLoop_DrawAxis()
 {
     //Set Tolology Linestrip and register Axis Vertex Buffer
     Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
@@ -730,12 +730,12 @@ void CDX::_17_DXLoop_DrawAxis()
     Context->DrawIndexed(2, 0, 0);
 }
 
-void CDX::_18_DXLoop_FlipSwapChain()
+void DX11::_18_DXLoop_FlipSwapChain()
 {
     SwapChain->Present(1, 0);
 }
 
-void CDX::DXLoop()
+void DX11::DXLoop()
 {
     _9_DXLoop_UpdateTime();
     _10_DXLoop_UpdateKey();

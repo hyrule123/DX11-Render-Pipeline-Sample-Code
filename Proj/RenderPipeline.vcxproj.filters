@@ -27,7 +27,7 @@
     <ClInclude Include="SimpleMath.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="CDX.h">
+    <ClInclude Include="DX11.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="CKeyMgr.h">
@@ -50,7 +50,7 @@
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="CDX.cpp">
+    <ClCompile Include="DX11.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="CKeyMgr.cpp">

@@ -21,13 +21,13 @@ enum class eCalculationMode
 };
 
 
-class CDX
+class DX11
 {
 private:
-	CDX() = delete;
+	DX11() = delete;
 public:
-	CDX(const Vec2& _WinSize);
-	~CDX();
+	DX11(const Vec2& _WinSize);
+	~DX11();
 	
 public:
 	ComPtr<ID3D11Device> get_device() { return Device; };

@@ -12,7 +12,7 @@
 #include <tchar.h>
 
 #include "Manager.h"
-#include "CDX.h"
+#include "DX11.h"
 
 RECT WINSIZE = { 0, 0, 1280, 720 };
 wchar_t ProgPath[MAX_PATH] = {};
@@ -53,9 +53,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         return FALSE;
     }
 
-    Manager& manager = Manager::get_inst();
-
-    CDX* DX = new CDX(Vec2((float)WINSIZE.right, (float)WINSIZE.bottom));
+    if (false == Manager::get_inst().init())
+    {
+        return FALSE;
+    }
 
     //윈도우 사이즈 조절 
     AdjustWindowRect(&WINSIZE, WS_OVERLAPPEDWINDOW, false);
@@ -84,13 +85,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         else
         {
-            DX->DXLoop();
+            Manager::get_inst().run();
         }
     }
 
-
-    delete DX;
-
+    Manager::destroy_inst();
     return (int)msg.wParam;
 }
 
