@@ -170,8 +170,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DX11.h" />
-    <ClInclude Include="CKeyMgr.h" />
-    <ClInclude Include="CTimer.h" />
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="Manager.h" />
     <ClInclude Include="Resource.h" />
@@ -182,8 +182,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DX11.cpp" />
-    <ClCompile Include="CKeyMgr.cpp" />
-    <ClCompile Include="CTimer.cpp" />
+    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Manager.cpp" />
     <ClCompile Include="TextRenderer.cpp" />

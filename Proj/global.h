@@ -40,6 +40,8 @@ using namespace Microsoft::WRL;
 #endif
 
 //MACRO
+#define SAFE_DELETE(_ptr) if(_ptr) { delete _ptr; }
+
 #define ERROR_MESSAGE(_msg) MessageBoxW(NULL, _msg, L"Error", MB_OK)
 //
 

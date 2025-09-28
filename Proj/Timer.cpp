@@ -1,8 +1,8 @@
-#include "CTimer.h"
+#include "Timer.h"
 
 float g_DeltaTime;
 
-CTimer::CTimer()
+Timer::Timer()
 {
 	LARGE_INTEGER Freq;
 	QueryPerformanceFrequency(&Freq);
@@ -16,11 +16,11 @@ CTimer::CTimer()
 	SetFPSLimit(60);
 }
 
-CTimer::~CTimer()
+Timer::~Timer()
 {
 }
 
-void CTimer::tick()
+void Timer::tick()
 {
 	QueryPerformanceCounter(&m_CurFreq);
 
@@ -38,7 +38,7 @@ void CTimer::tick()
 	m_PrevFreq = m_CurFreq;
 }
 
-void CTimer::SetFPSLimit(UINT16 _FPSLimit)
+void Timer::SetFPSLimit(UINT16 _FPSLimit)
 {
 	m_FPSLimit = _FPSLimit;
 	m_FrameTimeLimit = 1.f / (float)m_FPSLimit;

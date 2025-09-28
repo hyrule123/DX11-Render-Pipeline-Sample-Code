@@ -15,8 +15,8 @@
 
 #include "settings.h"
 
-#include "CTimer.h"
-#include "CKeyMgr.h"
+#include "Timer.h"
+#include "Input.h"
 
 #include <FW1FontWrapper/FW1FontWrapper.h>
 
@@ -28,20 +28,14 @@ DX11::DX11():
 
 DX11::~DX11()
 {
-    delete KeyMgr;
-    delete Timer;
 }
 
 bool DX11::init()
 {
-    Timer = new CTimer;
-    KeyMgr = new CKeyMgr;
-
 
     CameraPosition = Vector3(0.f, 0.f, -100.f);
     //CameraRotation = Vector3(1.f, 1.f, 1.f);
     CubeScale = Vector3(50.f, 50.f, 50.f);
-
 
     vRenderResolution.x = DEFAULT_WIDTH;
     vRenderResolution.y = DEFAULT_HEIGHT;

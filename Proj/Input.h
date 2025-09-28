@@ -43,11 +43,16 @@ struct tKeyInfo
 	}
 };
 
-class CKeyMgr
+class Input
 {
-public:
-	CKeyMgr();
-	~CKeyMgr();
+	friend class Manager;
+private:
+	Input();
+	~Input();
+
+	Input(const Input& _other) = delete;
+	Input(Input&& _move) = delete;
+
 	void tick();
 
 private:

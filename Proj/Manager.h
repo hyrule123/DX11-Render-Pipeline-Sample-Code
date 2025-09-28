@@ -3,6 +3,8 @@
 #include "global.h"
 
 class DX11;
+class Timer;
+class Input;
 
 class Manager
 {
@@ -35,5 +37,11 @@ private:
 	Manager(Manager&& _other) = delete;
 
 	DX11* m_dx;
+
+	//Timer
+	Timer* m_timer;
+
+	//Key Manager
+	Input* m_input;
 };
 

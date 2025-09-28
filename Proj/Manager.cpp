@@ -1,19 +1,29 @@
 #include "Manager.h"
 
 #include "DX11.h"
+#include "Input.h"
+#include "Timer.h"
 
 Manager::Manager()
 	: m_dx()
+	, m_timer()
+	, m_input()
 {
 }
 
 Manager::~Manager()
 {
-	if (m_dx) { delete m_dx; }
+	SAFE_DELETE(m_input);
+	SAFE_DELETE(m_timer);
+	SAFE_DELETE(m_dx);
 }
 
 bool Manager::init()
 {
+	m_input = new Input;
+	m_timer = new Timer;
+	m_dx = new DX11;
+
 	 RECT WINSIZE = {};
 	 WINSIZE.left = 0;
 	 WINSIZE.right = (LONG)DEFAULT_WIDTH;
@@ -24,8 +34,6 @@ bool Manager::init()
 	AdjustWindowRect(&WINSIZE, WS_OVERLAPPEDWINDOW, false);
 	SetWindowPos(g_hWnd, nullptr, 100, 100, WINSIZE.right - WINSIZE.left, WINSIZE.bottom - WINSIZE.top, 0);
 	ShowWindow(g_hWnd, true);
-
-	m_dx = new DX11;
 
 	return true;
 }

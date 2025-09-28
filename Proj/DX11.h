@@ -2,8 +2,8 @@
 #include "global.h"
 
 extern HWND g_hWnd;
-class CTimer;
-class CKeyMgr;
+class Timer;
+class Input;
 
 enum eDirection
 {
@@ -151,14 +151,6 @@ private:
 	Matrix	matCameraRotation;	//Needed for camera movement
 	
 	Matrix	ViewMatrix;
-	Matrix	ProjectionMatrix;
-
-	//Timer
-	CTimer* Timer;
-	
-	//Key Manager
-	CKeyMgr* KeyMgr;
-
-	
+	Matrix	ProjectionMatrix;	
 };
 

@@ -1,4 +1,4 @@
-#include "CKeyMgr.h"
+#include "Input.h"
 
 int g_arrKey[(UINT16)eKey::END]
 {
@@ -19,7 +19,7 @@ int g_arrKey[(UINT16)eKey::END]
 extern HWND g_hWnd;
 extern RECT WINSIZE;
 
-CKeyMgr::CKeyMgr()
+Input::Input()
 {
 	m_vecKeyInfo.resize(eKey::END);
 	for (UINT16 i = 0; i < eKey::END; ++i)
@@ -28,11 +28,11 @@ CKeyMgr::CKeyMgr()
 	}
 }
 
-CKeyMgr::~CKeyMgr()
+Input::~Input()
 {
 }
 
-void CKeyMgr::tick()
+void Input::tick()
 {
 	if (NULL != GetFocus())
 	{

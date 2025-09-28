@@ -3,11 +3,15 @@
 #include <windows.h>
 
 
-class CTimer
+class Timer
 {
-public:
-	CTimer();
-	~CTimer();
+	friend class Manager;
+private:
+	Timer();
+	~Timer();
+	Timer(const Timer& _other) = delete;
+	Timer(Timer&& _move) = delete;
+
 	void tick();
 
 private:
