@@ -249,37 +249,37 @@ void DX11::_8_DXInit_CreateMeshes()
     //정점정보 생성
     Vertex v = {};
 
-    v.vPos = Vec3(-0.5f, 0.5f, -0.5f);
-    v.vColor = Vec4(1.f, 0.f, 0.f, 1.f);
+    v.vPos = Vector3(-0.5f, 0.5f, -0.5f);
+    v.vColor = Vector4(1.f, 0.f, 0.f, 1.f);
     vecVBCube.push_back(v);
 
-    v.vPos = Vec3(0.5f, 0.5f, -0.5f);
-    v.vColor = Vec4(0.f, 1.f, 0.f, 1.f);
+    v.vPos = Vector3(0.5f, 0.5f, -0.5f);
+    v.vColor = Vector4(0.f, 1.f, 0.f, 1.f);
     vecVBCube.push_back(v);
 
-    v.vPos = Vec3(0.5f, -0.5f, -0.5f);
-    v.vColor = Vec4(0.f, 0.f, 1.f, 1.f);
+    v.vPos = Vector3(0.5f, -0.5f, -0.5f);
+    v.vColor = Vector4(0.f, 0.f, 1.f, 1.f);
     vecVBCube.push_back(v);
 
-    v.vPos = Vec3(-0.5f, -0.5f, -0.5f);
-    v.vColor = Vec4(0.f, 0.f, 0.f, 1.f);
+    v.vPos = Vector3(-0.5f, -0.5f, -0.5f);
+    v.vColor = Vector4(0.f, 0.f, 0.f, 1.f);
     vecVBCube.push_back(v);
 
 
-    v.vPos = Vec3(-0.5f, 0.5f, 0.5f);
-    v.vColor = Vec4(1.f, 0.f, 0.f, 1.f);
+    v.vPos = Vector3(-0.5f, 0.5f, 0.5f);
+    v.vColor = Vector4(1.f, 0.f, 0.f, 1.f);
     vecVBCube.push_back(v);
 
-    v.vPos = Vec3(0.5f, 0.5f, 0.5f);
-    v.vColor = Vec4(0.f, 1.f, 0.f, 1.f);
+    v.vPos = Vector3(0.5f, 0.5f, 0.5f);
+    v.vColor = Vector4(0.f, 1.f, 0.f, 1.f);
     vecVBCube.push_back(v);
 
-    v.vPos = Vec3(0.5f, -0.5f, 0.5f);
-    v.vColor = Vec4(0.f, 0.f, 1.f, 1.f);
+    v.vPos = Vector3(0.5f, -0.5f, 0.5f);
+    v.vColor = Vector4(0.f, 0.f, 1.f, 1.f);
     vecVBCube.push_back(v);
 
-    v.vPos = Vec3(-0.5f, -0.5f, 0.5f);
-    v.vColor = Vec4(0.f, 0.f, 0.f, 1.f);
+    v.vPos = Vector3(-0.5f, -0.5f, 0.5f);
+    v.vColor = Vector4(0.f, 0.f, 0.f, 1.f);
     vecVBCube.push_back(v);
 
     //직접 정점 계산 모드를 위한 값을 복사
@@ -341,27 +341,27 @@ void DX11::_8_DXInit_CreateMeshes()
 
     //=========Create Axis Buffer===============
     //Origin Vertex
-    v.vPos = Vec3(0.f, 0.f, 0.f);
-    v.vColor = Vec4(1.f, 1.f, 1.f, 1.f);
+    v.vPos = Vector3(0.f, 0.f, 0.f);
+    v.vColor = Vector4(1.f, 1.f, 1.f, 1.f);
     vecVBAxis.push_back(v);
 
     //X Vertex
-    v.vPos = Vec3(1.5f, 0.f, 0.f);
-    v.vColor = Vec4(1.f, 0.f, 0.f, 1.f);
+    v.vPos = Vector3(1.5f, 0.f, 0.f);
+    v.vColor = Vector4(1.f, 0.f, 0.f, 1.f);
     vecVBAxis.push_back(v);
     arrIBAxisX[0] = 0u;
     arrIBAxisX[1] = 1u;
 
     //Y Vertex
-    v.vPos = Vec3(0.f, 1.5f, 0.f);
-    v.vColor = Vec4(0.f, 1.f, 0.f, 1.f);
+    v.vPos = Vector3(0.f, 1.5f, 0.f);
+    v.vColor = Vector4(0.f, 1.f, 0.f, 1.f);
     vecVBAxis.push_back(v);
     arrIBAxisY[0] = 0u;
     arrIBAxisY[1] = 2u;
     
     //Z Vertex
-    v.vPos = Vec3(0.f, 0.f, 1.5f);
-    v.vColor = Vec4(0.f, 0.f, 1.f, 1.f);
+    v.vPos = Vector3(0.f, 0.f, 1.5f);
+    v.vColor = Vector4(0.f, 0.f, 1.f, 1.f);
     vecVBAxis.push_back(v);
     arrIBAxisZ[0] = 0u;
     arrIBAxisZ[1] = 3u;
@@ -395,9 +395,9 @@ void DX11::_8_DXInit_CreateMeshes()
 
 void DX11::_10_DXLoop_UpdateKey()
 {
-    Vec3 Forward = matCameraRotation.Forward();
-    Vec3 Right = matCameraRotation.Right();
-    Vec3 Up = matCameraRotation.Up();
+    Vector3 Forward = matCameraRotation.Forward();
+    Vector3 Right = matCameraRotation.Right();
+    Vector3 Up = matCameraRotation.Up();
 
     Input& input = Manager::get_inst().get_Input_inst();
     float deltatime = Manager::get_inst().get_Timer_inst().get_deltatime();
@@ -446,7 +446,7 @@ void DX11::_11_DXLoop_WorldSpaceTransform()
 
     if (input.GetKeyPressed(eKey::MOUSE_LBUTTON))
     {
-        Vec2 Dir = input.GetMouseDir();
+        Vector2 Dir = input.GetMouseDir();
 
         Matrix RotByCamAxisY = Matrix::CreateFromAxisAngle(matCameraRotation.Up(), -Dir.x * deltatime);
         Matrix RotByCamAxisX = Matrix::CreateFromAxisAngle(matCameraRotation.Right(), Dir.y * deltatime);
@@ -457,15 +457,15 @@ void DX11::_11_DXLoop_WorldSpaceTransform()
         
         
         
-        //const Vec3 CubeCamDistance = CubePosition - CameraPosition;
+        //const Vector3 CubeCamDistance = CubePosition - CameraPosition;
 
 
         //Matrix Rot = Matrix::CreateFromAxisAngle()
 
 
-        //Vec2 Dir = Input->GetMouseDir();
+        //Vector2 Dir = Input->GetMouseDir();
 
-        //const Vec3 CubeCamDistance = CubePosition - CameraPosition;
+        //const Vector3 CubeCamDistance = CubePosition - CameraPosition;
         //
         ////1. 우선 카메라의 위치까지 큐브를 끌어오는 행렬을 만든다.
         //Matrix PulltoCameraPos = XMMatrixTranslationFromVector(-CubeCamDistance);
@@ -474,7 +474,7 @@ void DX11::_11_DXLoop_WorldSpaceTransform()
 
 
         ////2. 회전도 반대로 회전시켜서 카메라와 축을 일치시킨다.
-        //Vec3 CubeCamRotation = CubeRotation - CameraRotation;
+        //Vector3 CubeCamRotation = CubeRotation - CameraRotation;
 
         ////2-1. 카메라의 축 기준으로 반대로 회전시켜 준다.
         //Matrix RotX = Matrix::CreateFromAxisAngle(matCameraRotation.Right(), CubeCamRotation.x);
@@ -504,7 +504,7 @@ void DX11::_11_DXLoop_WorldSpaceTransform()
     }
     else if (input.GetKeyPressed(eKey::MOUSE_RBUTTON))
     {
-        Vec2 Dir = input.GetMouseDir();
+        Vector2 Dir = input.GetMouseDir();
 
         CameraRotation.x -= Dir.y * deltatime;
         CameraRotation.y += Dir.x * deltatime;
@@ -594,7 +594,7 @@ void DX11::_11_DXLoop_WorldSpaceTransform()
 
     //    //1. Euler -> Quaternion Transformation
     //    ///Divide Half
-    //    Vec3 HalfAngle(CubeRotation.x / 2.f, CubeRotation.y / 2.f, CubeRotation.z / 2.f);
+    //    Vector3 HalfAngle(CubeRotation.x / 2.f, CubeRotation.y / 2.f, CubeRotation.z / 2.f);
 
     //    ///1-1. Quaternion CubeRotation XYZ
     //    Quaternion QRotX, QRotY, QRotZ;
@@ -651,11 +651,11 @@ void DX11::_12_DXLoop_ViewSpaceTransform()
 
 
     ////Calculate camera direction(For move camera)
-    //Vec3 BasisDir[3] =
+    //Vector3 BasisDir[3] =
     //{
-    //    Vec3(1.f, 0.f, 0.f),
-    //    Vec3(0.f, 1.f, 0.f),
-    //    Vec3(0.f, 0.f, 1.f)
+    //    Vector3(1.f, 0.f, 0.f),
+    //    Vector3(0.f, 1.f, 0.f),
+    //    Vector3(0.f, 0.f, 1.f)
     //};
 
     //for (int i = 0; i < eDIREND; ++i)
@@ -707,7 +707,7 @@ void DX11::_15_DXLoop_SetShader()
     Context->OMSetRenderTargets(1, RTV.GetAddressOf(), DSV.Get());
 
     //화면 클리어
-    Vec4 ClearColor = Vec4(0.5f, 0.5f, 0.5f, 1.f);
+    Vector4 ClearColor = Vector4(0.5f, 0.5f, 0.5f, 1.f);
     Context->ClearRenderTargetView(RTV.Get(), ClearColor);
     Context->ClearDepthStencilView(DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 

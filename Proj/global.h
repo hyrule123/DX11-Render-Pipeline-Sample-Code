@@ -11,9 +11,6 @@
 #include "SimpleMath.h"
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
-typedef Vector2 Vec2;
-typedef Vector3 Vec3;
-typedef Vector4 Vec4;
 
 #include <d3dcompiler.h>
 #pragma comment (lib, "d3dcompiler")
@@ -48,8 +45,8 @@ using namespace Microsoft::WRL;
 //구조체
 struct Vertex
 {
-	Vec3 vPos;
-	Vec4 vColor;
+	Vector3 vPos;
+	Vector4 vColor;
 };
 
 struct Transform

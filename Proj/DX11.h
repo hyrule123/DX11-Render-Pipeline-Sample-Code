@@ -69,7 +69,7 @@ private:
 private:
 //==================================== VARIABLES ============================================
 
-	Vec2							vRenderResolution;
+	Vector2							vRenderResolution;
 	
 	ComPtr<ID3D11Device> Device;
 	ComPtr<ID3D11DeviceContext> Context;

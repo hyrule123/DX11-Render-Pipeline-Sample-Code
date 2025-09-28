@@ -60,14 +60,14 @@ private:
 
 private:
 	std::vector<tKeyStatus> m_key_statuses;
-	Vec2 m_cur_mouse_pos;
-	Vec2 m_prev_mouse_pos;
-	Vec2 m_mouse_dir;
+	Vector2 m_cur_mouse_pos;
+	Vector2 m_prev_mouse_pos;
+	Vector2 m_mouse_dir;
 	
 public:
 	bool GetKeyPressed(eKey _Key)	{ return (eKeyState::Pressed & m_key_statuses[_Key].State); }
 	bool GetKeyTap(eKey _Key)		{ return (eKeyState::Tap & m_key_statuses[_Key].State); }
 	bool GetKeyRelease(eKey _Key)	{ return (eKeyState::Release & m_key_statuses[_Key].State); }
-	const Vec2& GetMouseDir() { return m_mouse_dir; }
+	const Vector2& GetMouseDir() { return m_mouse_dir; }
 };
 
