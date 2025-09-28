@@ -169,6 +169,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="CubeModel.h" />
+    <ClInclude Include="CubeWorld.h" />
     <ClInclude Include="DX11.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Timer.h" />
@@ -181,6 +184,9 @@
     <ClInclude Include="TextRenderer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CubeModel.cpp" />
+    <ClCompile Include="CubeWorld.cpp" />
     <ClCompile Include="DX11.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Timer.cpp" />

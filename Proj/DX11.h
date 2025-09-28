@@ -102,54 +102,9 @@ private:
 
 	D3D11_VIEWPORT					ViewPort;
 
-	//Vertex Buffer, Index Buffer(Meshes)
-	std::vector<Vertex> vecVBCube;
-	std::vector<UINT> vecIBCube;
-	ComPtr<ID3D11Buffer>			VBCube;
-	ComPtr<ID3D11Buffer>			IBCube;
 
-	std::vector<Vertex>				vecVBAxis;
-	UINT							arrIBAxisX[2];
-	UINT							arrIBAxisY[2];
-	UINT							arrIBAxisZ[2];
-	ComPtr<ID3D11Buffer>			VBAxis;
-	ComPtr<ID3D11Buffer>			IBAxisX;
-	ComPtr<ID3D11Buffer>			IBAxisY;
-	ComPtr<ID3D11Buffer>			IBAxisZ;
 
 	//Constant Buffer
 	ComPtr<ID3D11Buffer>			CB;
-
-
-
-
-	//World Coordinates
-	Vec3	CubePosition;
-	Vec3	CubeScale;
-	Vec3	CubeRotation;
-	bool	UseQuaternion;
-
-	Matrix	matCubeScale;
-	Matrix	matCubeRotation;
-	Matrix	matCubeTranslation;
-	
-
-	Matrix	WorldMatrix;
-
-
-	//Manual calculation mode
-	//Do all jobs on C++
-	bool	ManualCalculation;
-	std::vector<Vec4> vecCubeVtxPos;	
-
-	//Camera
-	float	AspectRatio;
-	float	FieldOfView;	//FOV
-	Vec3	CameraPosition;
-	Vec3	CameraRotation;
-	Matrix	matCameraRotation;	//Needed for camera movement
-	
-	Matrix	ViewMatrix;
-	Matrix	ProjectionMatrix;	
 };
 
