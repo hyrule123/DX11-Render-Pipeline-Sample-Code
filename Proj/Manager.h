@@ -24,10 +24,12 @@ private:
 ////////////////////////////////
 
 public:
-	bool init();
+	void init();
 	void run();
 
 	DX11& get_DX11_inst() { return *m_dx; }
+	Timer& get_Timer_inst() { return *m_timer; }
+	Input& get_Input_inst() { return *m_input; }
 
 private:
 	Manager();

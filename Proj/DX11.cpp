@@ -15,6 +15,7 @@
 
 #include "settings.h"
 
+#include "Manager.h"
 #include "Timer.h"
 #include "Input.h"
 
@@ -26,13 +27,8 @@ DX11::DX11():
 {
 }
 
-DX11::~DX11()
+void DX11::init()
 {
-}
-
-bool DX11::init()
-{
-
     CameraPosition = Vector3(0.f, 0.f, -100.f);
     //CameraRotation = Vector3(1.f, 1.f, 1.f);
     CubeScale = Vector3(50.f, 50.f, 50.f);
@@ -51,8 +47,24 @@ bool DX11::init()
     _6_DXInit_CreateDefaultGraphicsShader();
     _7_DXInit_CreateConstBuffer();
     _8_DXInit_CreateMeshes();
+}
 
-    return true;
+DX11::~DX11()
+{
+}
+
+void DX11::update()
+{
+    _10_DXLoop_UpdateKey();
+    _12_DXLoop_ViewSpaceTransform();
+    _11_DXLoop_WorldSpaceTransform();
+
+    _13_DXLoop_ProjectionSpaceTransform();
+    _14_DXLoop_UpdateBuffer();
+    _15_DXLoop_SetShader();
+    _16_DXLoop_DrawCube();
+    _17_DXLoop_DrawAxis();
+    _18_DXLoop_FlipSwapChain();
 }
 
 void DX11::_0_DXInit_DeviceContext()
@@ -381,34 +393,30 @@ void DX11::_8_DXInit_CreateMeshes()
 
 }
 
-void DX11::_9_DXLoop_UpdateTime()
-{
-    Timer->tick();
-}
-
 void DX11::_10_DXLoop_UpdateKey()
 {
-    KeyMgr->tick();
-
     Vec3 Forward = matCameraRotation.Forward();
     Vec3 Right = matCameraRotation.Right();
     Vec3 Up = matCameraRotation.Up();
 
-    if (KeyMgr->GetKeyPressed(eKey::W))
+    Input& input = Manager::get_inst().get_Input_inst();
+    float deltatime = Manager::get_inst().get_Timer_inst().get_deltatime();
+
+    if (input.GetKeyPressed(eKey::W))
     {
-        CameraPosition += Forward * 100.f * g_DeltaTime;
+        CameraPosition += Forward * 100.f * deltatime;
     }
-    if (KeyMgr->GetKeyPressed(eKey::S))
+    if (input.GetKeyPressed(eKey::S))
     {
-        CameraPosition -= Forward * 100.f * g_DeltaTime;
+        CameraPosition -= Forward * 100.f * deltatime;
     }
-    if (KeyMgr->GetKeyPressed(eKey::A))
+    if (input.GetKeyPressed(eKey::A))
     {
-        CameraPosition -= Right * 100.f * g_DeltaTime;
+        CameraPosition -= Right * 100.f * deltatime;
     }
-    if (KeyMgr->GetKeyPressed(eKey::D))
+    if (input.GetKeyPressed(eKey::D))
     {
-        CameraPosition += Right * 100.f * g_DeltaTime;
+        CameraPosition += Right * 100.f * deltatime;
     }
 
 }
@@ -433,12 +441,15 @@ void DX11::_11_DXLoop_WorldSpaceTransform()
 
     matCubeRotation = matRotEulerZ * matRotEulerX * matRotEulerY;
 
-    if (KeyMgr->GetKeyPressed(eKey::MOUSE_LBUTTON))
-    {
-        Vec2 Dir = KeyMgr->GetMouseDir();
+    Input& input = Manager::get_inst().get_Input_inst();
+    float deltatime = Manager::get_inst().get_Timer_inst().get_deltatime();
 
-        Matrix RotByCamAxisY = Matrix::CreateFromAxisAngle(matCameraRotation.Up(), -Dir.x * g_DeltaTime);
-        Matrix RotByCamAxisX = Matrix::CreateFromAxisAngle(matCameraRotation.Right(), Dir.y * g_DeltaTime);
+    if (input.GetKeyPressed(eKey::MOUSE_LBUTTON))
+    {
+        Vec2 Dir = input.GetMouseDir();
+
+        Matrix RotByCamAxisY = Matrix::CreateFromAxisAngle(matCameraRotation.Up(), -Dir.x * deltatime);
+        Matrix RotByCamAxisX = Matrix::CreateFromAxisAngle(matCameraRotation.Right(), Dir.y * deltatime);
 
         matCubeRotation *= RotByCamAxisX * RotByCamAxisY;
         
@@ -452,7 +463,7 @@ void DX11::_11_DXLoop_WorldSpaceTransform()
         //Matrix Rot = Matrix::CreateFromAxisAngle()
 
 
-        //Vec2 Dir = KeyMgr->GetMouseDir();
+        //Vec2 Dir = Input->GetMouseDir();
 
         //const Vec3 CubeCamDistance = CubePosition - CameraPosition;
         //
@@ -491,12 +502,12 @@ void DX11::_11_DXLoop_WorldSpaceTransform()
         //Matrix PushtoCameraPos = XMMatrixTranslationFromVector(CubeCamDistance);
         //matCubeRotation *= PushtoCameraPos;
     }
-    else if (KeyMgr->GetKeyPressed(eKey::MOUSE_RBUTTON))
+    else if (input.GetKeyPressed(eKey::MOUSE_RBUTTON))
     {
-        Vec2 Dir = KeyMgr->GetMouseDir();
+        Vec2 Dir = input.GetMouseDir();
 
-        CameraRotation.x -= Dir.y * g_DeltaTime;
-        CameraRotation.y += Dir.x * g_DeltaTime;
+        CameraRotation.x -= Dir.y * deltatime;
+        CameraRotation.y += Dir.x * deltatime;
     }
 
 
@@ -737,24 +748,6 @@ void DX11::_17_DXLoop_DrawAxis()
 void DX11::_18_DXLoop_FlipSwapChain()
 {
     SwapChain->Present(1, 0);
-}
-
-void DX11::DXLoop()
-{
-    _9_DXLoop_UpdateTime();
-    _10_DXLoop_UpdateKey();
-
-
-    _12_DXLoop_ViewSpaceTransform();
-    _11_DXLoop_WorldSpaceTransform();
-
-
-    _13_DXLoop_ProjectionSpaceTransform();
-    _14_DXLoop_UpdateBuffer();
-    _15_DXLoop_SetShader();
-    _16_DXLoop_DrawCube();
-    _17_DXLoop_DrawAxis();
-    _18_DXLoop_FlipSwapChain();
 }
 
 void DX11::set_resolution(const Vector2& _size)

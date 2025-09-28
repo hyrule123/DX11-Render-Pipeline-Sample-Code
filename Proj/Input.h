@@ -31,12 +31,12 @@ enum eKeyState : UINT8
 	Release = (UINT8)1 << (UINT8)2
 };
 
-struct tKeyInfo
+struct tKeyStatus
 {
 	eKey myKey;
 	UINT8 State;	//Using Bit Flag
 
-	tKeyInfo():
+	tKeyStatus():
 		myKey(),
 		State((UINT8)0)
 	{
@@ -48,23 +48,26 @@ class Input
 	friend class Manager;
 private:
 	Input();
+
+	void init();
+
 	~Input();
 
 	Input(const Input& _other) = delete;
 	Input(Input&& _move) = delete;
 
-	void tick();
+	void update();
 
 private:
-	std::vector<tKeyInfo> m_vecKeyInfo;
-	Vec2 m_MousePos;
-	Vec2 m_PrevMousePos;
-	Vec2 m_MouseDir;
+	std::vector<tKeyStatus> m_key_statuses;
+	Vec2 m_cur_mouse_pos;
+	Vec2 m_prev_mouse_pos;
+	Vec2 m_mouse_dir;
 	
 public:
-	bool GetKeyPressed(eKey _Key)	{ return (eKeyState::Pressed & m_vecKeyInfo[_Key].State); }
-	bool GetKeyTap(eKey _Key)		{ return (eKeyState::Tap & m_vecKeyInfo[_Key].State); }
-	bool GetKeyRelease(eKey _Key)	{ return (eKeyState::Release & m_vecKeyInfo[_Key].State); }
-	const Vec2& GetMouseDir() { return m_MouseDir; }
+	bool GetKeyPressed(eKey _Key)	{ return (eKeyState::Pressed & m_key_statuses[_Key].State); }
+	bool GetKeyTap(eKey _Key)		{ return (eKeyState::Tap & m_key_statuses[_Key].State); }
+	bool GetKeyRelease(eKey _Key)	{ return (eKeyState::Release & m_key_statuses[_Key].State); }
+	const Vec2& GetMouseDir() { return m_mouse_dir; }
 };
 

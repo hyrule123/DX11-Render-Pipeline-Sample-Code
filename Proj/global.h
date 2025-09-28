@@ -58,6 +58,5 @@ struct Transform
 };
 
 //전역 변수
-extern float g_DeltaTime;
 extern HWND g_hWnd;
 extern HINSTANCE g_hInstance;

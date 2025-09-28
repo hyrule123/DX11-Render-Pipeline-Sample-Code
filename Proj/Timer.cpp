@@ -1,45 +1,53 @@
 #include "Timer.h"
 
-float g_DeltaTime;
-
 Timer::Timer()
+	: m_prev_freq()
+	, m_cur_freq()
+	, m_freq()
+	, m_FPS_limit()
+	, m_frame_time_limit()
+	, m_deltatime()
+{
+}
+
+void Timer::init()
 {
 	LARGE_INTEGER Freq;
 	QueryPerformanceFrequency(&Freq);
-	m_Freq = 1.f / (float)Freq.QuadPart;
+	m_freq = 1.f / (float)Freq.QuadPart;
 
-	QueryPerformanceCounter(&m_PrevFreq);
-	QueryPerformanceCounter(&m_CurFreq);
+	QueryPerformanceCounter(&m_prev_freq);
+	QueryPerformanceCounter(&m_cur_freq);
 
-	g_DeltaTime = 0.f;
+	m_deltatime = 0.f;
 
-	SetFPSLimit(60);
+	set_FPS_limit(60);
 }
 
 Timer::~Timer()
 {
 }
 
-void Timer::tick()
+void Timer::update()
 {
-	QueryPerformanceCounter(&m_CurFreq);
+	QueryPerformanceCounter(&m_cur_freq);
 
-	g_DeltaTime = (m_CurFreq.QuadPart - m_PrevFreq.QuadPart) * m_Freq;
+	m_deltatime = (m_cur_freq.QuadPart - m_prev_freq.QuadPart) * m_freq;
 
-	if (g_DeltaTime < m_FrameTimeLimit)
+	if (m_deltatime < m_frame_time_limit)
 	{
-		Sleep((DWORD)((m_FrameTimeLimit - g_DeltaTime) * 1000.f));
+		Sleep((DWORD)((m_frame_time_limit - m_deltatime) * 1000.f));
 	}
 	else
 	{
-		g_DeltaTime = m_FrameTimeLimit;
+		m_deltatime = m_frame_time_limit;
 	}
 
-	m_PrevFreq = m_CurFreq;
+	m_prev_freq = m_cur_freq;
 }
 
-void Timer::SetFPSLimit(UINT16 _FPSLimit)
+void Timer::set_FPS_limit(UINT16 _FPSLimit)
 {
-	m_FPSLimit = _FPSLimit;
-	m_FrameTimeLimit = 1.f / (float)m_FPSLimit;
+	m_FPS_limit = _FPSLimit;
+	m_frame_time_limit = 1.f / (float)m_FPS_limit;
 }

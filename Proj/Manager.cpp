@@ -18,11 +18,16 @@ Manager::~Manager()
 	SAFE_DELETE(m_dx);
 }
 
-bool Manager::init()
+void Manager::init()
 {
 	m_input = new Input;
+	m_input->init();
+
 	m_timer = new Timer;
+	m_timer->init();
+
 	m_dx = new DX11;
+	m_dx->init();
 
 	 RECT WINSIZE = {};
 	 WINSIZE.left = 0;
@@ -34,10 +39,11 @@ bool Manager::init()
 	AdjustWindowRect(&WINSIZE, WS_OVERLAPPEDWINDOW, false);
 	SetWindowPos(g_hWnd, nullptr, 100, 100, WINSIZE.right - WINSIZE.left, WINSIZE.bottom - WINSIZE.top, 0);
 	ShowWindow(g_hWnd, true);
-
-	return true;
 }
 
 void Manager::run()
 {
+	m_timer->update();
+	m_input->update();
+
 }

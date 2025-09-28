@@ -23,20 +23,23 @@ enum class eCalculationMode
 
 class DX11
 {
-public:
-	DX11();
-	~DX11();
-
-	bool init();
+	friend class Manager;
 
 private:
+	DX11();
+	void init();
+
 	DX11(const DX11& _other) = delete;
-	DX11(DX11&& _other) = delete;
+	DX11(DX11&& _move) = delete;
+	~DX11();
+	
+	void update();
 	
 public:
 	ComPtr<ID3D11Device> get_device() { return Device; };
 	ComPtr<ID3D11DeviceContext> get_context() { return Context; }
 
+private:
 //========= DXE ===================
 	void _0_DXInit_DeviceContext();
 	void _1_DXInit_CreateSwapChain();
@@ -48,7 +51,6 @@ public:
 	void _7_DXInit_CreateConstBuffer();
 	void _8_DXInit_CreateMeshes();				//Local Space
 
-	void _9_DXLoop_UpdateTime();
 	void _10_DXLoop_UpdateKey();
 	void _11_DXLoop_WorldSpaceTransform();		//World Space
 	void _12_DXLoop_ViewSpaceTransform();		//View Space
@@ -59,10 +61,7 @@ public:
 	void _17_DXLoop_DrawAxis();
 	void _18_DXLoop_FlipSwapChain ();
 
-
-
-//====== LOOP =======
-	void DXLoop();
+	
 
 private:
 	void set_resolution(const Vector2& _size);
