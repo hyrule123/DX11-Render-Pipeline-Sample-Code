@@ -2,6 +2,8 @@
 
 #include "global.h"
 
+class DX11;
+
 class Manager
 {
 //SINGLETON
@@ -23,10 +25,15 @@ public:
 	bool init();
 	void run();
 
+	DX11& get_DX11_inst() { return *m_dx; }
+
 private:
 	Manager();
 	~Manager();
 
-	
+	Manager(const Manager& _other) = delete;
+	Manager(Manager&& _other) = delete;
+
+	DX11* m_dx;
 };
 

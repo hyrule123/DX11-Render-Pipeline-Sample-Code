@@ -13,14 +13,26 @@
 
 #endif
 
+#include "settings.h"
+
 #include "CTimer.h"
 #include "CKeyMgr.h"
 
 #include <FW1FontWrapper/FW1FontWrapper.h>
 
-DX11::DX11(const Vec2& _WinSize):
+DX11::DX11():
     UseQuaternion(false),
     ManualCalculation(false)
+{
+}
+
+DX11::~DX11()
+{
+    delete KeyMgr;
+    delete Timer;
+}
+
+bool DX11::init()
 {
     Timer = new CTimer;
     KeyMgr = new CKeyMgr;
@@ -31,7 +43,9 @@ DX11::DX11(const Vec2& _WinSize):
     CubeScale = Vector3(50.f, 50.f, 50.f);
 
 
-    vRenderResolution = _WinSize;
+    vRenderResolution.x = DEFAULT_WIDTH;
+    vRenderResolution.y = DEFAULT_HEIGHT;
+
     AspectRatio = vRenderResolution.x / vRenderResolution.y;
 
     _0_DXInit_DeviceContext();
@@ -43,12 +57,8 @@ DX11::DX11(const Vec2& _WinSize):
     _6_DXInit_CreateDefaultGraphicsShader();
     _7_DXInit_CreateConstBuffer();
     _8_DXInit_CreateMeshes();
-}
 
-DX11::~DX11()
-{
-    delete KeyMgr;
-    delete Timer;
+    return true;
 }
 
 void DX11::_0_DXInit_DeviceContext()
@@ -751,4 +761,9 @@ void DX11::DXLoop()
     _16_DXLoop_DrawCube();
     _17_DXLoop_DrawAxis();
     _18_DXLoop_FlipSwapChain();
+}
+
+void DX11::set_resolution(const Vector2& _size)
+{
+
 }

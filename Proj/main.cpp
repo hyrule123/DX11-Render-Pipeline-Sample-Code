@@ -14,12 +14,10 @@
 #include "Manager.h"
 #include "DX11.h"
 
-RECT WINSIZE = { 0, 0, 1280, 720 };
-wchar_t ProgPath[MAX_PATH] = {};
-
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
+wchar_t ProgPath[MAX_PATH] = {};
 HINSTANCE g_hInst;   // 현재 인스턴스입니다.
 HWND g_hWnd;
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
@@ -55,13 +53,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     if (false == Manager::get_inst().init())
     {
+        ERROR_MESSAGE(L"Manager 초기화 실패");
         return FALSE;
     }
-
-    //윈도우 사이즈 조절 
-    AdjustWindowRect(&WINSIZE, WS_OVERLAPPEDWINDOW, false);
-    SetWindowPos(g_hWnd, nullptr, 100, 100, WINSIZE.right - WINSIZE.left, WINSIZE.bottom - WINSIZE.top, 0);
-    ShowWindow(g_hWnd, true);
 
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_RENDERPIPELINE));

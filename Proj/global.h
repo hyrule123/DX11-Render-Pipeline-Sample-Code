@@ -1,5 +1,7 @@
 #pragma once
 
+#include "settings.h"
+
 #define WIN32_LEAN_AND_MEAN
 #include "Windows.h"
 
@@ -21,7 +23,10 @@ using namespace Microsoft::WRL;
 
 #define CHKFAIL(hr)      if(((HRESULT)(hr)) < 0) assert(false)
 
+//////// STL ////////////
 #include <vector>
+#include <memory>
+////////////////////
 
 #include <FW1FontWrapper/FW1FontWrapper.h>
 #if defined (_WIN64) && (_DEBUG)
@@ -33,6 +38,10 @@ using namespace Microsoft::WRL;
 #pragma comment (lib, "FW1FontWrapper/x64/Release/FW1FontWrapper.lib")
 
 #endif
+
+//MACRO
+#define ERROR_MESSAGE(_msg) MessageBoxW(NULL, _msg, L"Error", MB_OK)
+//
 
 //구조체
 struct Vertex

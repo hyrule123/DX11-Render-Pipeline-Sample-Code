@@ -23,11 +23,15 @@ enum class eCalculationMode
 
 class DX11
 {
-private:
-	DX11() = delete;
 public:
-	DX11(const Vec2& _WinSize);
+	DX11();
 	~DX11();
+
+	bool init();
+
+private:
+	DX11(const DX11& _other) = delete;
+	DX11(DX11&& _other) = delete;
 	
 public:
 	ComPtr<ID3D11Device> get_device() { return Device; };
@@ -60,8 +64,10 @@ public:
 //====== LOOP =======
 	void DXLoop();
 
+private:
+	void set_resolution(const Vector2& _size);
 
-
+private:
 //==================================== VARIABLES ============================================
 
 	Vec2							vRenderResolution;
