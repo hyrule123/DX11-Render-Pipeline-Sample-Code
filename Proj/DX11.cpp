@@ -27,23 +27,18 @@ DX11::DX11()
 
 void DX11::init()
 {
-    //CameraRotation = Vector3(1.f, 1.f, 1.f);
-    CubeScale = Vector3(50.f, 50.f, 50.f);
-
     m_resolution.x = DEFAULT_WIDTH;
     m_resolution.y = DEFAULT_HEIGHT;
 
-    AspectRatio = m_resolution.x / m_resolution.y;
-
     _0_DXInit_DeviceContext();
     _1_DXInit_CreateSwapChain();
-    _2_DXInit_CreateView();
-    _3_DXInit_CreateInputAssembler();
+    _2_DXInit_CreateRenderTargetView();
+    //_3_DXInit_CreateInputAssembler();
     _4_DXInit_CreateBlendState();
     _5_DXInit_CreateSampler();
-    _6_DXInit_CreateDefaultGraphicsShader();
-    _7_DXInit_CreateConstBuffer();
-    _8_DXInit_CreateMeshes();
+    //_6_DXInit_CreateDefaultGraphicsShader();
+    //_7_DXInit_CreateConstBuffer();
+    //_8_DXInit_CreateMeshes();
 }
 
 DX11::~DX11()
@@ -122,7 +117,7 @@ void DX11::_1_DXInit_CreateSwapChain()
     CHKFAIL(DXGIFactory->CreateSwapChain(m_device.Get(), &Desc, SwapChain.GetAddressOf()));
 }
 
-void DX11::_2_DXInit_CreateView()
+void DX11::_2_DXInit_CreateRenderTargetView()
 {
     CHKFAIL(SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)RTTex.GetAddressOf()));
 
@@ -159,31 +154,6 @@ void DX11::_2_DXInit_CreateView()
     m_context->RSSetViewports(1, &ViewPort);
 }
 
-void DX11::_3_DXInit_CreateInputAssembler()
-{
-    D3D11_INPUT_ELEMENT_DESC IADesc[2] = {};
-
-    //정점 위치(CubePosition)
-    IADesc[0].SemanticName = "POSITION";
-    IADesc[0].SemanticIndex = 0;
-    IADesc[0].AlignedByteOffset = 0;
-    IADesc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-    IADesc[0].InputSlot = 0;
-    IADesc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-    IADesc[0].InstanceDataStepRate = 0;
-
-    //색상 정보(COLOR) - 정점 위치 다음에 오므로 ByteOffset 12
-    IADesc[1].SemanticName = "COLOR";
-    IADesc[1].SemanticIndex = 0;
-    IADesc[1].AlignedByteOffset = 12;
-    IADesc[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-    IADesc[1].InputSlot = 0;
-    IADesc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-    IADesc[1].InstanceDataStepRate = 0;
-
-    CHKFAIL(m_device->CreateInputLayout(IADesc, 2, g_VS, sizeof(g_VS), InputLayout.GetAddressOf()));
-}
-
 
 void DX11::_4_DXInit_CreateBlendState()
 {
@@ -201,194 +171,6 @@ void DX11::_5_DXInit_CreateSampler()
     m_device->CreateSamplerState(&SamDesc, Sampler.GetAddressOf());
 }
 
-void DX11::_6_DXInit_CreateDefaultGraphicsShader()
-{
-    //GetModuleFileNameW(0, ProgPath, MAX_PATH);
-
-    //int iLen = (int)wcslen(ProgPath);
-
-    ////프로그램 파일 명을 제거한다.
-    //for (int i = iLen - 1; i >= 0; --i)
-    //{
-    //    if (L'\\' == ProgPath[i])
-    //    {
-    //        ProgPath[i + 1] = 0;
-    //        break;
-    //    }
-    //}   
-
-    //wchar_t ShaderPath[MAX_PATH] = {};
-    //lstrcpyW(ShaderPath, ProgPath);
-    //lstrcatW(ShaderPath, L"Shader.cso");
-
-    CHKFAIL(m_device->CreateVertexShader(g_VS, sizeof(g_VS), nullptr, &VS));
-    CHKFAIL(m_device->CreatePixelShader(g_PS, sizeof(g_PS), nullptr, &PS));
-
-}
-
-
-
-void DX11::_7_DXInit_CreateConstBuffer()
-{
-    //기본적으로 계산된 WVP Matrix를 보내는 용도로 사용할 상수 버퍼
-
-    D3D11_BUFFER_DESC Desc = {};
-    Desc.ByteWidth = sizeof(Matrix);
-    Desc.Usage = D3D11_USAGE_DYNAMIC;
-    Desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    Desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-    CHKFAIL(m_device->CreateBuffer(&Desc, nullptr, CB.GetAddressOf()));
-}
-
-void DX11::_8_DXInit_CreateMeshes()
-{
-    //정점정보 생성
-    Vertex v = {};
-
-    v.vPos = Vector3(-0.5f, 0.5f, -0.5f);
-    v.vColor = Vector4(1.f, 0.f, 0.f, 1.f);
-    vecVBCube.push_back(v);
-
-    v.vPos = Vector3(0.5f, 0.5f, -0.5f);
-    v.vColor = Vector4(0.f, 1.f, 0.f, 1.f);
-    vecVBCube.push_back(v);
-
-    v.vPos = Vector3(0.5f, -0.5f, -0.5f);
-    v.vColor = Vector4(0.f, 0.f, 1.f, 1.f);
-    vecVBCube.push_back(v);
-
-    v.vPos = Vector3(-0.5f, -0.5f, -0.5f);
-    v.vColor = Vector4(0.f, 0.f, 0.f, 1.f);
-    vecVBCube.push_back(v);
-
-
-    v.vPos = Vector3(-0.5f, 0.5f, 0.5f);
-    v.vColor = Vector4(1.f, 0.f, 0.f, 1.f);
-    vecVBCube.push_back(v);
-
-    v.vPos = Vector3(0.5f, 0.5f, 0.5f);
-    v.vColor = Vector4(0.f, 1.f, 0.f, 1.f);
-    vecVBCube.push_back(v);
-
-    v.vPos = Vector3(0.5f, -0.5f, 0.5f);
-    v.vColor = Vector4(0.f, 0.f, 1.f, 1.f);
-    vecVBCube.push_back(v);
-
-    v.vPos = Vector3(-0.5f, -0.5f, 0.5f);
-    v.vColor = Vector4(0.f, 0.f, 0.f, 1.f);
-    vecVBCube.push_back(v);
-
-    //직접 정점 계산 모드를 위한 값을 복사
-    //Copy values for manual vertex CubePosition calculation mode
-    size_t size = vecVBCube.size();
-    for (size_t i = 0; i < size; ++i)
-    {
-        vecCubeVtxPos.push_back(Vector4(vecVBCube[i].vPos, 1.f));
-    }
-
-    //정점버퍼 생성
-    D3D11_BUFFER_DESC VBDesc = {};
-    VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    VBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    VBDesc.Usage = D3D11_USAGE_DYNAMIC;
-
-    VBDesc.ByteWidth = (UINT)(sizeof(Vertex) * vecVBCube.size());
-
-    D3D11_SUBRESOURCE_DATA VtxData = {};
-    VtxData.pSysMem = (void*)vecVBCube.data();
-
-    CHKFAIL(m_device->CreateBuffer(&VBDesc, &VtxData, VBCube.GetAddressOf()));
-
-    //인덱스 정보 생성
-    UINT arrIB[] = {
-        0, 1, 2,
-        0, 2, 3,
-
-        1, 5, 6,
-        1, 6, 2,
-
-        3, 2, 6,
-        3, 6, 7,
-
-        4, 0, 3,
-        4, 3, 7,
-
-        4, 5, 1,
-        4, 1, 0,
-
-        5, 4, 7,
-        5, 7, 6
-    };
-
-    vecIBCube.insert(vecIBCube.begin(), arrIB, arrIB + 36);
-
-    //인덱스 버퍼 생성
-    D3D11_BUFFER_DESC IBDesc = {};
-    IBDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-    IBDesc.CPUAccessFlags = 0;
-    IBDesc.Usage = D3D11_USAGE_DEFAULT;
-    IBDesc.ByteWidth = (UINT)(vecIBCube.size() * sizeof(UINT));
-
-    D3D11_SUBRESOURCE_DATA IdxData = {};
-    IdxData.pSysMem = (void*)vecIBCube.data();
-
-    CHKFAIL(m_device->CreateBuffer(&IBDesc, &IdxData, IBCube.GetAddressOf()));
-
-
-    //=========Create Axis Buffer===============
-    //Origin Vertex
-    v.vPos = Vector3(0.f, 0.f, 0.f);
-    v.vColor = Vector4(1.f, 1.f, 1.f, 1.f);
-    vecVBAxis.push_back(v);
-
-    //X Vertex
-    v.vPos = Vector3(1.5f, 0.f, 0.f);
-    v.vColor = Vector4(1.f, 0.f, 0.f, 1.f);
-    vecVBAxis.push_back(v);
-    arrIBAxisX[0] = 0u;
-    arrIBAxisX[1] = 1u;
-
-    //Y Vertex
-    v.vPos = Vector3(0.f, 1.5f, 0.f);
-    v.vColor = Vector4(0.f, 1.f, 0.f, 1.f);
-    vecVBAxis.push_back(v);
-    arrIBAxisY[0] = 0u;
-    arrIBAxisY[1] = 2u;
-    
-    //Z Vertex
-    v.vPos = Vector3(0.f, 0.f, 1.5f);
-    v.vColor = Vector4(0.f, 0.f, 1.f, 1.f);
-    vecVBAxis.push_back(v);
-    arrIBAxisZ[0] = 0u;
-    arrIBAxisZ[1] = 3u;
-
-    //Create Axis Vertex Buffer
-    VBDesc.ByteWidth = (UINT)(sizeof(Vertex) * vecVBAxis.size());
-    VtxData = {};
-    VtxData.pSysMem = (void*)vecVBAxis.data();
-    CHKFAIL(m_device->CreateBuffer(&VBDesc, &VtxData, VBAxis.GetAddressOf()));
-
-    //Create Axis Index Buffer
-    //X
-    IBDesc.ByteWidth = (UINT)(2u * sizeof(UINT));
-    IdxData = {};
-    IdxData.pSysMem = (void*)arrIBAxisX;
-    CHKFAIL(m_device->CreateBuffer(&IBDesc, &IdxData, IBAxisX.GetAddressOf()));   
-
-    //Y
-    IBDesc.ByteWidth = (UINT)(2u * sizeof(UINT));
-    IdxData = {};
-    IdxData.pSysMem = (void*)arrIBAxisY;
-    CHKFAIL(m_device->CreateBuffer(&IBDesc, &IdxData, IBAxisY.GetAddressOf()));  
-
-    //Z
-    IBDesc.ByteWidth = (UINT)(2u * sizeof(UINT));
-    IdxData = {};
-    IdxData.pSysMem = (void*)arrIBAxisZ;
-    CHKFAIL(m_device->CreateBuffer(&IBDesc, &IdxData, IBAxisZ.GetAddressOf()));
-
-}
 
 void DX11::_10_DXLoop_UpdateKey()
 {

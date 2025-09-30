@@ -45,15 +45,15 @@ private:
 //========= DXE ===================
 	void _0_DXInit_DeviceContext();
 	void _1_DXInit_CreateSwapChain();
-	void _2_DXInit_CreateView();
-	void _3_DXInit_CreateInputAssembler();
+	void _2_DXInit_CreateRenderTargetView();
+	//void _3_DXInit_CreateInputAssembler();
 	void _4_DXInit_CreateBlendState();
 	void _5_DXInit_CreateSampler();
-	void _6_DXInit_CreateDefaultGraphicsShader();
-	void _7_DXInit_CreateConstBuffer();
-	void _8_DXInit_CreateMeshes();				//Local Space
+	//void _6_DXInit_CreateDefaultGraphicsShader();
+	//void _7_DXInit_CreateConstBuffer();
+	//void _8_DXInit_CreateMeshes();				//Local Space
 
-	void _10_DXLoop_UpdateKey();
+	//void _10_DXLoop_UpdateKey();
 	void _11_DXLoop_WorldSpaceTransform();		//World Space
 	void _12_DXLoop_ViewSpaceTransform();		//View Space
 	void _13_DXLoop_ProjectionSpaceTransform();	//Projection Space
@@ -82,13 +82,6 @@ private:
 	ComPtr<ID3D11Texture2D>			DSTex = {};
 	ComPtr<ID3D11DepthStencilView>	DSV = {};
 
-	//Input Assembler
-	ComPtr<ID3D11InputLayout>		InputLayout = {};
-
-	//Shader
-	ComPtr<ID3D11VertexShader>		VS = {};
-	ComPtr<ID3D11PixelShader>		PS = {};
-
 	// Sampler
 	ComPtr<ID3D11SamplerState>		Sampler = {};
 
@@ -106,7 +99,6 @@ private:
 
 
 
-	//Constant Buffer
-	ComPtr<ID3D11Buffer>			CB = {};
+
 };
 
