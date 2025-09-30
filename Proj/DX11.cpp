@@ -21,22 +21,19 @@
 
 #include <FW1FontWrapper/FW1FontWrapper.h>
 
-DX11::DX11():
-    UseQuaternion(false),
-    ManualCalculation(false)
+DX11::DX11()
 {
 }
 
 void DX11::init()
 {
-    CameraPosition = Vector3(0.f, 0.f, -100.f);
     //CameraRotation = Vector3(1.f, 1.f, 1.f);
     CubeScale = Vector3(50.f, 50.f, 50.f);
 
-    vRenderResolution.x = DEFAULT_WIDTH;
-    vRenderResolution.y = DEFAULT_HEIGHT;
+    m_resolution.x = DEFAULT_WIDTH;
+    m_resolution.y = DEFAULT_HEIGHT;
 
-    AspectRatio = vRenderResolution.x / vRenderResolution.y;
+    AspectRatio = m_resolution.x / m_resolution.y;
 
     _0_DXInit_DeviceContext();
     _1_DXInit_CreateSwapChain();
@@ -84,8 +81,8 @@ void DX11::_0_DXInit_DeviceContext()
         nullptr,
         0,
         D3D11_SDK_VERSION,
-        Device.GetAddressOf(), &DXLevel,
-        Context.GetAddressOf()
+        m_device.GetAddressOf(), &DXLevel,
+        m_context.GetAddressOf()
     ));
 }
 
@@ -98,8 +95,8 @@ void DX11::_1_DXInit_CreateSwapChain()
 
     Desc.BufferCount = 2;
     Desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    Desc.BufferDesc.Width = (UINT)vRenderResolution.x;
-    Desc.BufferDesc.Height = (UINT)vRenderResolution.y;
+    Desc.BufferDesc.Width = (UINT)m_resolution.x;
+    Desc.BufferDesc.Height = (UINT)m_resolution.y;
     Desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     Desc.BufferDesc.RefreshRate.Denominator = 1;
     Desc.BufferDesc.RefreshRate.Numerator = 60;
@@ -116,26 +113,26 @@ void DX11::_1_DXInit_CreateSwapChain()
     ComPtr<IDXGIAdapter> DXGIAdapter;
     ComPtr<IDXGIFactory> DXGIFactory;
 
-    CHKFAIL(Device->QueryInterface(__uuidof(IDXGIDevice), (void**)DXGIDevice.GetAddressOf()));
+    CHKFAIL(m_device->QueryInterface(__uuidof(IDXGIDevice), (void**)DXGIDevice.GetAddressOf()));
 
     CHKFAIL(DXGIDevice->GetParent(__uuidof(IDXGIAdapter), (void**)DXGIAdapter.GetAddressOf()));
 
     CHKFAIL(DXGIAdapter->GetParent(__uuidof(IDXGIFactory), (void**)DXGIFactory.GetAddressOf()));
 
-    CHKFAIL(DXGIFactory->CreateSwapChain(Device.Get(), &Desc, SwapChain.GetAddressOf()));
+    CHKFAIL(DXGIFactory->CreateSwapChain(m_device.Get(), &Desc, SwapChain.GetAddressOf()));
 }
 
 void DX11::_2_DXInit_CreateView()
 {
     CHKFAIL(SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)RTTex.GetAddressOf()));
 
-    CHKFAIL(Device->CreateRenderTargetView(RTTex.Get(), nullptr, RTV.GetAddressOf()));
+    CHKFAIL(m_device->CreateRenderTargetView(RTTex.Get(), nullptr, RTV.GetAddressOf()));
 
     D3D11_TEXTURE2D_DESC Desc = {};
 
     Desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    Desc.Width = (UINT)vRenderResolution.x;
-    Desc.Height = (UINT)vRenderResolution.y;
+    Desc.Width = (UINT)m_resolution.x;
+    Desc.Height = (UINT)m_resolution.y;
     Desc.ArraySize = 1;
 
     Desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
@@ -146,20 +143,20 @@ void DX11::_2_DXInit_CreateView()
     Desc.SampleDesc.Count = 1;
     Desc.SampleDesc.Quality = 0;
 
-    CHKFAIL(Device->CreateTexture2D(&Desc, nullptr, DSTex.GetAddressOf()));
-    CHKFAIL(Device->CreateDepthStencilView(DSTex.Get(), nullptr, DSV.GetAddressOf()));
+    CHKFAIL(m_device->CreateTexture2D(&Desc, nullptr, DSTex.GetAddressOf()));
+    CHKFAIL(m_device->CreateDepthStencilView(DSTex.Get(), nullptr, DSV.GetAddressOf()));
 
 
     ViewPort.TopLeftX = 0.f;
     ViewPort.TopLeftY = 0.f;
 
-    ViewPort.Width = vRenderResolution.x;
-    ViewPort.Height = vRenderResolution.y;
+    ViewPort.Width = m_resolution.x;
+    ViewPort.Height = m_resolution.y;
     ViewPort.MinDepth = 0.f;
     ViewPort.MaxDepth = 1.f;
 
     //뷰포트(스크린) 지정
-    Context->RSSetViewports(1, &ViewPort);
+    m_context->RSSetViewports(1, &ViewPort);
 }
 
 void DX11::_3_DXInit_CreateInputAssembler()
@@ -184,7 +181,7 @@ void DX11::_3_DXInit_CreateInputAssembler()
     IADesc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
     IADesc[1].InstanceDataStepRate = 0;
 
-    CHKFAIL(Device->CreateInputLayout(IADesc, 2, g_VS, sizeof(g_VS), InputLayout.GetAddressOf()));
+    CHKFAIL(m_device->CreateInputLayout(IADesc, 2, g_VS, sizeof(g_VS), InputLayout.GetAddressOf()));
 }
 
 
@@ -201,7 +198,7 @@ void DX11::_5_DXInit_CreateSampler()
     SamDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
     SamDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
     SamDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-    Device->CreateSamplerState(&SamDesc, Sampler.GetAddressOf());
+    m_device->CreateSamplerState(&SamDesc, Sampler.GetAddressOf());
 }
 
 void DX11::_6_DXInit_CreateDefaultGraphicsShader()
@@ -224,8 +221,8 @@ void DX11::_6_DXInit_CreateDefaultGraphicsShader()
     //lstrcpyW(ShaderPath, ProgPath);
     //lstrcatW(ShaderPath, L"Shader.cso");
 
-    CHKFAIL(Device->CreateVertexShader(g_VS, sizeof(g_VS), nullptr, &VS));
-    CHKFAIL(Device->CreatePixelShader(g_PS, sizeof(g_PS), nullptr, &PS));
+    CHKFAIL(m_device->CreateVertexShader(g_VS, sizeof(g_VS), nullptr, &VS));
+    CHKFAIL(m_device->CreatePixelShader(g_PS, sizeof(g_PS), nullptr, &PS));
 
 }
 
@@ -241,7 +238,7 @@ void DX11::_7_DXInit_CreateConstBuffer()
     Desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     Desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-    CHKFAIL(Device->CreateBuffer(&Desc, nullptr, CB.GetAddressOf()));
+    CHKFAIL(m_device->CreateBuffer(&Desc, nullptr, CB.GetAddressOf()));
 }
 
 void DX11::_8_DXInit_CreateMeshes()
@@ -301,7 +298,7 @@ void DX11::_8_DXInit_CreateMeshes()
     D3D11_SUBRESOURCE_DATA VtxData = {};
     VtxData.pSysMem = (void*)vecVBCube.data();
 
-    CHKFAIL(Device->CreateBuffer(&VBDesc, &VtxData, VBCube.GetAddressOf()));
+    CHKFAIL(m_device->CreateBuffer(&VBDesc, &VtxData, VBCube.GetAddressOf()));
 
     //인덱스 정보 생성
     UINT arrIB[] = {
@@ -336,7 +333,7 @@ void DX11::_8_DXInit_CreateMeshes()
     D3D11_SUBRESOURCE_DATA IdxData = {};
     IdxData.pSysMem = (void*)vecIBCube.data();
 
-    CHKFAIL(Device->CreateBuffer(&IBDesc, &IdxData, IBCube.GetAddressOf()));
+    CHKFAIL(m_device->CreateBuffer(&IBDesc, &IdxData, IBCube.GetAddressOf()));
 
 
     //=========Create Axis Buffer===============
@@ -370,26 +367,26 @@ void DX11::_8_DXInit_CreateMeshes()
     VBDesc.ByteWidth = (UINT)(sizeof(Vertex) * vecVBAxis.size());
     VtxData = {};
     VtxData.pSysMem = (void*)vecVBAxis.data();
-    CHKFAIL(Device->CreateBuffer(&VBDesc, &VtxData, VBAxis.GetAddressOf()));
+    CHKFAIL(m_device->CreateBuffer(&VBDesc, &VtxData, VBAxis.GetAddressOf()));
 
     //Create Axis Index Buffer
     //X
     IBDesc.ByteWidth = (UINT)(2u * sizeof(UINT));
     IdxData = {};
     IdxData.pSysMem = (void*)arrIBAxisX;
-    CHKFAIL(Device->CreateBuffer(&IBDesc, &IdxData, IBAxisX.GetAddressOf()));   
+    CHKFAIL(m_device->CreateBuffer(&IBDesc, &IdxData, IBAxisX.GetAddressOf()));   
 
     //Y
     IBDesc.ByteWidth = (UINT)(2u * sizeof(UINT));
     IdxData = {};
     IdxData.pSysMem = (void*)arrIBAxisY;
-    CHKFAIL(Device->CreateBuffer(&IBDesc, &IdxData, IBAxisY.GetAddressOf()));  
+    CHKFAIL(m_device->CreateBuffer(&IBDesc, &IdxData, IBAxisY.GetAddressOf()));  
 
     //Z
     IBDesc.ByteWidth = (UINT)(2u * sizeof(UINT));
     IdxData = {};
     IdxData.pSysMem = (void*)arrIBAxisZ;
-    CHKFAIL(Device->CreateBuffer(&IBDesc, &IdxData, IBAxisZ.GetAddressOf()));
+    CHKFAIL(m_device->CreateBuffer(&IBDesc, &IdxData, IBAxisZ.GetAddressOf()));
 
 }
 
@@ -677,7 +674,7 @@ void DX11::_12_DXLoop_ViewSpaceTransform()
 
 void DX11::_13_DXLoop_ProjectionSpaceTransform()
 {
-    AspectRatio = vRenderResolution.x / vRenderResolution.y;
+    AspectRatio = m_resolution.x / m_resolution.y;
     FieldOfView = XM_PI / 3.f;
 
     float NearPlane = 1.f;
@@ -692,57 +689,57 @@ void DX11::_14_DXLoop_UpdateBuffer()
     WorldViewProjectionMatrix = WorldViewProjectionMatrix.Transpose();
 
     D3D11_MAPPED_SUBRESOURCE SubRes = {};
-    if (!FAILED(Context->Map(CB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &SubRes)))
+    if (!FAILED(m_context->Map(CB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &SubRes)))
     {
         memcpy_s(SubRes.pData, sizeof(Matrix), static_cast<void*>(&WorldViewProjectionMatrix), sizeof(Matrix));
-        Context->Unmap(CB.Get(), 0);
+        m_context->Unmap(CB.Get(), 0);
     }
 
-    Context->VSSetConstantBuffers(0, 1, CB.GetAddressOf());
+    m_context->VSSetConstantBuffers(0, 1, CB.GetAddressOf());
 }
 
 void DX11::_15_DXLoop_SetShader()
 {
     //출력 병합기에 새 렌더타겟을 등록.
-    Context->OMSetRenderTargets(1, RTV.GetAddressOf(), DSV.Get());
+    m_context->OMSetRenderTargets(1, RTV.GetAddressOf(), DSV.Get());
 
     //화면 클리어
     Vector4 ClearColor = Vector4(0.5f, 0.5f, 0.5f, 1.f);
-    Context->ClearRenderTargetView(RTV.Get(), ClearColor);
-    Context->ClearDepthStencilView(DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
+    m_context->ClearRenderTargetView(RTV.Get(), ClearColor);
+    m_context->ClearDepthStencilView(DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
     //입력 조립기에 레이아웃을 등록
-    Context->IASetInputLayout(InputLayout.Get());
+    m_context->IASetInputLayout(InputLayout.Get());
 
-    Context->VSSetShader(VS.Get(), nullptr, 0);
-    Context->PSSetShader(PS.Get(), nullptr, 0);
+    m_context->VSSetShader(VS.Get(), nullptr, 0);
+    m_context->PSSetShader(PS.Get(), nullptr, 0);
 }
 
 void DX11::_16_DXLoop_DrawCube()
 {
-    Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     UINT VBStride = sizeof(Vertex);
     UINT VBOffset = 0;
-    Context->IASetVertexBuffers(0, 1, VBCube.GetAddressOf(), &VBStride, &VBOffset);
-    Context->IASetIndexBuffer(IBCube.Get(), DXGI_FORMAT_R32_UINT, 0);
+    m_context->IASetVertexBuffers(0, 1, VBCube.GetAddressOf(), &VBStride, &VBOffset);
+    m_context->IASetIndexBuffer(IBCube.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-    Context->DrawIndexed(36, 0, 0);
+    m_context->DrawIndexed(36, 0, 0);
 }
 
 void DX11::_17_DXLoop_DrawAxis()
 {
     //Set Tolology Linestrip and register Axis Vertex Buffer
-    Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+    m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
     UINT VBStride = sizeof(Vertex);
     UINT VBOffset = 0;
-    Context->IASetVertexBuffers(0, 1, VBAxis.GetAddressOf(), &VBStride, &VBOffset);
+    m_context->IASetVertexBuffers(0, 1, VBAxis.GetAddressOf(), &VBStride, &VBOffset);
 
-    Context->IASetIndexBuffer(IBAxisX.Get(), DXGI_FORMAT_R32_UINT, 0);
-    Context->DrawIndexed(2, 0, 0);
-    Context->IASetIndexBuffer(IBAxisY.Get(), DXGI_FORMAT_R32_UINT, 0);
-    Context->DrawIndexed(2, 0, 0);
-    Context->IASetIndexBuffer(IBAxisZ.Get(), DXGI_FORMAT_R32_UINT, 0);
-    Context->DrawIndexed(2, 0, 0);
+    m_context->IASetIndexBuffer(IBAxisX.Get(), DXGI_FORMAT_R32_UINT, 0);
+    m_context->DrawIndexed(2, 0, 0);
+    m_context->IASetIndexBuffer(IBAxisY.Get(), DXGI_FORMAT_R32_UINT, 0);
+    m_context->DrawIndexed(2, 0, 0);
+    m_context->IASetIndexBuffer(IBAxisZ.Get(), DXGI_FORMAT_R32_UINT, 0);
+    m_context->DrawIndexed(2, 0, 0);
 }
 
 void DX11::_18_DXLoop_FlipSwapChain()

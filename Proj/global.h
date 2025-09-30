@@ -42,6 +42,14 @@ using namespace Microsoft::WRL;
 #define ERROR_MESSAGE(_msg) MessageBoxW(NULL, _msg, L"Error", MB_OK)
 //
 
+//enum
+enum class eProjMode
+{
+	Projection, 
+	Orthographic
+};
+//
+
 //구조체
 struct Vertex
 {

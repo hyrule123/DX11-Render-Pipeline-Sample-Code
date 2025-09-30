@@ -36,8 +36,10 @@ private:
 	void update();
 	
 public:
-	ComPtr<ID3D11Device> get_device() { return Device; };
-	ComPtr<ID3D11DeviceContext> get_context() { return Context; }
+	ComPtr<ID3D11Device> get_device() { return m_device; };
+	ComPtr<ID3D11DeviceContext> get_context() { return m_context; }
+
+	Vector2 get_resolution() const { return m_resolution; }
 
 private:
 //========= DXE ===================
@@ -69,42 +71,42 @@ private:
 private:
 //==================================== VARIABLES ============================================
 
-	Vector2							vRenderResolution;
+	Vector2							m_resolution = {};
 	
-	ComPtr<ID3D11Device> Device;
-	ComPtr<ID3D11DeviceContext> Context;
-	ComPtr<IDXGISwapChain> SwapChain;
-	ComPtr<ID3D11Texture2D>			RTTex;
-	ComPtr<ID3D11RenderTargetView>	RTV;
+	ComPtr<ID3D11Device> m_device = {};
+	ComPtr<ID3D11DeviceContext> m_context = {};
+	ComPtr<IDXGISwapChain> SwapChain = {};
+	ComPtr<ID3D11Texture2D>			RTTex = {};
+	ComPtr<ID3D11RenderTargetView>	RTV = {};
 
-	ComPtr<ID3D11Texture2D>			DSTex;
-	ComPtr<ID3D11DepthStencilView>	DSV;
+	ComPtr<ID3D11Texture2D>			DSTex = {};
+	ComPtr<ID3D11DepthStencilView>	DSV = {};
 
 	//Input Assembler
-	ComPtr<ID3D11InputLayout>		InputLayout;
+	ComPtr<ID3D11InputLayout>		InputLayout = {};
 
 	//Shader
-	ComPtr<ID3D11VertexShader>		VS;
-	ComPtr<ID3D11PixelShader>		PS;
+	ComPtr<ID3D11VertexShader>		VS = {};
+	ComPtr<ID3D11PixelShader>		PS = {};
 
 	// Sampler
-	ComPtr<ID3D11SamplerState>		Sampler;
+	ComPtr<ID3D11SamplerState>		Sampler = {};
 
 	// RasterizerState
-	ComPtr<ID3D11RasterizerState>	RSState;
+	ComPtr<ID3D11RasterizerState>	RSState = {};
 
 	// DepthStencilState
-	ComPtr<ID3D11DepthStencilState>	DSState;
+	ComPtr<ID3D11DepthStencilState>	DSState = {};
 
 	// BlendState
-	ComPtr<ID3D11BlendState>		BSState;
+	ComPtr<ID3D11BlendState>		BSState = {};
 
 
-	D3D11_VIEWPORT					ViewPort;
+	D3D11_VIEWPORT					ViewPort = {};
 
 
 
 	//Constant Buffer
-	ComPtr<ID3D11Buffer>			CB;
+	ComPtr<ID3D11Buffer>			CB = {};
 };
 
