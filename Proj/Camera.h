@@ -12,6 +12,7 @@ public:
 	~Camera();
 
 public:
+	void update();
 
 private:
 	void calculate_view_matrix();

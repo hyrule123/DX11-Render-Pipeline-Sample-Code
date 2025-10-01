@@ -2,8 +2,10 @@
 
 #include "Manager.h"
 #include "DX11.h"
+#include "Timer.h"
+#include "Input.h"
 
-#include <cmath>
+#include "MyMath.h"
 
 
 Camera::Camera() {}
@@ -37,6 +39,35 @@ Camera::~Camera()
 
 }
 
+void Camera::update()
+{
+	Matrix rot_mat = MyMath::get_rotation_matrix(m_rotation);
+
+	Vector3 Forward = rot_mat.Forward();
+	Vector3 Right = rot_mat.Right();
+	Vector3 Up = rot_mat.Up();
+
+	Input& input = Manager::get_inst().get_Input_inst();
+	float deltatime = Manager::get_inst().get_Timer_inst().get_deltatime();
+
+	if (input.GetKeyPressed(eKey::W))
+	{
+		m_position += Forward * 100.f * deltatime;
+	}
+	if (input.GetKeyPressed(eKey::S))
+	{
+		m_position -= Forward * 100.f * deltatime;
+	}
+	if (input.GetKeyPressed(eKey::A))
+	{
+		m_position -= Right * 100.f * deltatime;
+	}
+	if (input.GetKeyPressed(eKey::D))
+	{
+		m_position += Right * 100.f * deltatime;
+	}
+}
+
 void Camera::calculate_view_matrix()
 {
 	constexpr int X = 0, Y = 1, Z = 2;
@@ -49,19 +80,11 @@ void Camera::calculate_view_matrix()
 	rot_quat_inv.Normalize();	//정규화해서 단위 사원수로 변환
 	rot_quat_inv.Conjugate();	//단위 사원수의 역원은 켤레 사원수!, 켤레 사원수는 기존의 회전을 반대로 회전시킨다.
 	
-	/*
-	\begin{bmatrix} 
-	1 - 2(c^2 + d^2) & 2(ad + bc) & 2(bd - ac) \\
-	2(bc - ad) & 1 - 2(b^2 + d^2) & 2(ab + cd) \\
-	2(ac + bd) & 2(cd - ab) & 1 - 2(b^2 + c^2)
-	\end{bmatrix}
-	*/
+
 #define a w //scalar part
 #define b x
 #define c y
 #define d z
-
-	rot_quat_inv.x;
 
 	Matrix rot_mat_inv = Matrix::Identity;
 

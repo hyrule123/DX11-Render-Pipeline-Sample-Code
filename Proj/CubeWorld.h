@@ -9,17 +9,14 @@ public:
 
 	~CubeWorld();
 
+	void update();
+
 private:
 	//World Coordinates
-	Vector3	CubePosition = {};
-	Vector3	CubeScale = {};
-	Vector3	CubeRotation = {};
-	bool	UseQuaternion = {};
+	Vector3	m_scale = {};
+	Quaternion m_rotation = {};
+	Vector3	m_position = {};
 
-	Matrix	matCubeScale = {};
-	Matrix	matCubeRotation = {};
-	Matrix	matCubeTranslation = {};
-
-	Matrix	WorldMatrix = {};
+	Matrix	m_world_mat = {};
 };
 

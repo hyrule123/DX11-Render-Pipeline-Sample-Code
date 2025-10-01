@@ -54,7 +54,7 @@ private:
 	//void _8_DXInit_CreateMeshes();				//Local Space
 
 	//void _10_DXLoop_UpdateKey();
-	void _11_DXLoop_WorldSpaceTransform();		//World Space
+	//void _11_DXLoop_WorldSpaceTransform();		//World Space
 	void _12_DXLoop_ViewSpaceTransform();		//View Space
 	void _13_DXLoop_ProjectionSpaceTransform();	//Projection Space
 	void _14_DXLoop_UpdateBuffer();

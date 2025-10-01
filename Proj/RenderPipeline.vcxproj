@@ -186,6 +186,8 @@
     <ClInclude Include="CubeWorld.h" />
     <ClInclude Include="DX11.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="MyMath.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="ShaderHeader\PixelShader_Debug.h" />
     <ClInclude Include="ShaderHeader\VertexShader_Debug.h" />
     <ClInclude Include="Timer.h" />
@@ -203,6 +205,8 @@
     <ClCompile Include="CubeWorld.cpp" />
     <ClCompile Include="DX11.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="MyMath.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Manager.cpp" />
