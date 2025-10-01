@@ -3,30 +3,26 @@
 #include "DX11.h"
 #include "Input.h"
 #include "Timer.h"
+#include "Scene.h"
 
-Manager::Manager()
-	: m_dx()
-	, m_timer()
-	, m_input()
-{
-}
+Manager::Manager() {}
 
 Manager::~Manager()
 {
-	SAFE_DELETE(m_input);
-	SAFE_DELETE(m_timer);
-	SAFE_DELETE(m_dx);
+	m_input.reset();
+	m_timer.reset();
+	m_dx.reset();
 }
 
 void Manager::init()
 {
-	m_input = new Input;
+	m_input = std::make_unique<Input>();
 	m_input->init();
 
-	m_timer = new Timer;
+	m_timer = std::make_unique<Timer>();
 	m_timer->init();
 
-	m_dx = new DX11;
+	m_dx = std::make_unique<DX11>();
 	m_dx->init();
 
 	 RECT WINSIZE = {};
@@ -45,5 +41,5 @@ void Manager::run()
 {
 	m_timer->update();
 	m_input->update();
-
+	m_scene->update();
 }

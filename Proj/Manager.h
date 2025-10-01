@@ -5,6 +5,7 @@
 class DX11;
 class Timer;
 class Input;
+class Scene;
 
 class Manager
 {
@@ -30,6 +31,7 @@ public:
 	DX11& get_DX11_inst() { return *m_dx; }
 	Timer& get_Timer_inst() { return *m_timer; }
 	Input& get_Input_inst() { return *m_input; }
+	Scene& get_Scene_inst() { return *m_scene; }
 
 private:
 	Manager();
@@ -38,12 +40,15 @@ private:
 	Manager(const Manager& _other) = delete;
 	Manager(Manager&& _other) = delete;
 
-	DX11* m_dx;
+	std::unique_ptr<DX11> m_dx = {};
 
 	//Timer
-	Timer* m_timer;
+	std::unique_ptr<Timer> m_timer = {};
 
 	//Key Manager
-	Input* m_input;
+	std::unique_ptr<Input> m_input = {};
+
+	//Scene
+	std::unique_ptr<Scene> m_scene = {};
 };
 
