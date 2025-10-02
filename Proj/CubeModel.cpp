@@ -180,6 +180,7 @@ void CubeModel::create_cube_mesh()
     CHKFAIL(device->CreateBuffer(&VBDesc, &VtxData, VBCube.GetAddressOf()));
 
     //인덱스 정보 생성
+    /*
     UINT arrIB[] = {
         0, 1, 2,
         0, 2, 3,
@@ -198,6 +199,29 @@ void CubeModel::create_cube_mesh()
 
         5, 4, 7,
         5, 7, 6
+    };
+    */
+    
+    //오른손 좌표계와 왼손 좌표계는 Z축이 반전되어 있다
+    //따라서 외적의 결과도 반대 방향이 되어야 하므로 index 순서를 시계 방향에서 반시계 방향으로 교체한다.
+    UINT arrIB[] = {
+    0, 2, 1,
+    0, 3, 2,
+
+    1, 6, 5,
+    1, 2, 6,
+
+    3, 6, 2,
+    3, 7, 6,
+
+    4, 3, 0,
+    4, 7, 3,
+
+    4, 1, 5,
+    4, 0, 1,
+
+    5, 7, 4,
+    5, 6, 7
     };
 
     vecIBCube.insert(vecIBCube.begin(), arrIB, arrIB + 36);

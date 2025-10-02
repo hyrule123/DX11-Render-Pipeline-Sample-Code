@@ -70,33 +70,33 @@ void CubeWorld::rotate_by_cam_view(Camera* _cam, Vector2 _mouse_dir, float _delt
     //카메라의 회전 행렬을 가져온다.
     const Matrix& rot_mat = _cam->get_rotation_matrix();
     
-
-    //아이디어: 마우스 방향을 벡터로 계산하고
-    //수직 벡터를 구한뒤 그 벡터로 한번에 회전?(사원수)
-    
-    
     //마우스의 X, Y 좌표 변화를 회전으로 변환하기
 
     /*
-<-Y축 회전->(키보드의 X 변화량)
+<-Y축 회전->(커서의 X 변화량)
     |           
     |            ↑
-    |________ X축 회전(키보드의 Y 변화량)
+    |________ X축 회전(커서의 Y 변화량)
     */ //        ↓
 
     //직접 사원수 만들어 보기
 
     //회전량을 구한다
-    float theta_x = _mouse_dir.y * _deltatime;
-    Vector3 axis_x = Vector3{ rot_mat._21, rot_mat._22, rot_mat._23 };
+    //마우스를 위로 드래그하면 앞으로 굴러가는 게 직관적
+    //X축이 바라보는 방향 기준 반시계 방향이므로, 음수 방향으로 회전해야 함
+    float theta_x = - _mouse_dir.y * _deltatime;
+    Vector3 axis_x = Vector3{ rot_mat._11, rot_mat._12, rot_mat._13 };
     Quaternion x_quat = MyMath::get_quaternion(axis_x, theta_x);
     
     float theta_y = _mouse_dir.x * _deltatime;
-    Vector3 axis_y = Vector3{ rot_mat._11, rot_mat._12, rot_mat._13 };
+    Vector3 axis_y = Vector3{ rot_mat._21, rot_mat._22, rot_mat._23 };
 
     Quaternion y_quat = MyMath::get_quaternion(axis_y, theta_y);
 
     Quaternion final_quat = x_quat * y_quat;
 
     m_rotation *= final_quat;
+
+    //아이디어2: 마우스 방향을 벡터로 계산하고
+    //수직 벡터를 구한뒤 그 벡터로 한번에 회전?(사원수)
 }

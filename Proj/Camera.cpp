@@ -104,6 +104,14 @@ void Camera::calculate_view_matrix()
 
 	//V = (T * R)^-1 = R^-1 * T^-1
 	m_view_matrix = rot_mat_inv * pos_mat_inv;
+
+
+	//RH -> LH
+	//Z축을 반전시켜주어야 함!
+	m_view_matrix._31 = -m_view_matrix._31;
+	m_view_matrix._32 = -m_view_matrix._32;
+	m_view_matrix._33 = -m_view_matrix._33;
+	m_view_matrix._34 = -m_view_matrix._34;
 }
 
 void Camera::calculate_ortho_proj_matrix()
