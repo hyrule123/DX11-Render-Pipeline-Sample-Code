@@ -39,3 +39,23 @@ end{bmatrix}
 
     return rot_mat;
 }
+
+Quaternion MyMath::get_quaternion(Vector3 _axis, float _radian)
+{
+	Quaternion ret;
+
+	//축을 정규화해서 크기를 1로 맞춘다.
+	_axis.Normalize();
+	
+	//Vector part(i, j, k) *= sin(angle / 2)
+	_axis *= std::sin(_radian / 2.f);
+
+	//Scalar part(w) = cos(angle / 2)
+	ret.w = std::cos(_radian / 2.f);
+
+	ret.x = _axis.x;
+	ret.y = _axis.y;
+	ret.z = _axis.z;
+
+	return ret;
+}

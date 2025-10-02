@@ -8,19 +8,31 @@ Scene::Scene() {}
 
 void Scene::init()
 {
-	m_cube_model = std::make_unique<CubeModel>();
-	m_cube_world = std::make_unique<CubeWorld>();
-	m_camera = std::make_unique<Camera>();
+	m_cube_model = std::make_shared<CubeModel>();
+	m_cube_model->init();
+
+	m_cube_world = new CubeWorld;
+	m_cube_world->set_cube_model(m_cube_model);
+	m_cube_world->init();
+
+	m_camera = new Camera;
+	m_camera->init();
 }
 
 Scene::~Scene()
 {
-	m_camera.reset();
-	m_cube_world.reset();
-	m_cube_model.reset();
+	SAFE_DELETE(m_camera);
+	SAFE_DELETE(m_cube_world);
+	m_cube_model = nullptr;
 }
 
 void Scene::update()
 {
+	m_cube_world->update();
+	m_camera->update();
+}
 
+void Scene::render()
+{
+	m_camera->render(m_cube_world);
 }

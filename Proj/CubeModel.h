@@ -10,6 +10,8 @@ public:
 
 	~CubeModel();
 
+	void render(const Matrix& _WVP);
+
 private:
 	void create_input_assembler();
 	void create_shader();
@@ -20,19 +22,19 @@ private:
 
 private:
 	//Vertex Buffer, Index Buffer(Meshes)
-	std::vector<Vertex> vecVBCube;
-	std::vector<UINT> vecIBCube;
-	ComPtr<ID3D11Buffer>			VBCube;
-	ComPtr<ID3D11Buffer>			IBCube;
+	std::vector<Vertex> vecVBCube = {};
+	std::vector<UINT> vecIBCube = {};
+	ComPtr<ID3D11Buffer>			VBCube = {};
+	ComPtr<ID3D11Buffer>			IBCube = {};
 
-	std::vector<Vertex>				vecVBAxis;
-	UINT							arrIBAxisX[2];
-	UINT							arrIBAxisY[2];
-	UINT							arrIBAxisZ[2];
-	ComPtr<ID3D11Buffer>			VBAxis;
-	ComPtr<ID3D11Buffer>			IBAxisX;
-	ComPtr<ID3D11Buffer>			IBAxisY;
-	ComPtr<ID3D11Buffer>			IBAxisZ;
+	std::vector<Vertex>				vecVBAxis = {};
+	UINT							arrIBAxisX[2] = {};
+	UINT							arrIBAxisY[2] = {};
+	UINT							arrIBAxisZ[2] = {};
+	ComPtr<ID3D11Buffer>			VBAxis = {};
+	ComPtr<ID3D11Buffer>			IBAxisX = {};
+	ComPtr<ID3D11Buffer>			IBAxisY = {};
+	ComPtr<ID3D11Buffer>			IBAxisZ = {};
 
 	//Input Assembler
 	ComPtr<ID3D11InputLayout>		InputLayout = {};

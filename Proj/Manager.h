@@ -40,15 +40,15 @@ private:
 	Manager(const Manager& _other) = delete;
 	Manager(Manager&& _other) = delete;
 
-	std::unique_ptr<DX11> m_dx = {};
+	DX11* m_dx = {};
 
 	//Timer
-	std::unique_ptr<Timer> m_timer = {};
+	Timer* m_timer = {};
 
 	//Key Manager
-	std::unique_ptr<Input> m_input = {};
+	Input* m_input = {};
 
 	//Scene
-	std::unique_ptr<Scene> m_scene = {};
+	Scene* m_scene = {};
 };
 

@@ -12,5 +12,5 @@ struct VS_OUT
 
 cbuffer Transform : register(b0)
 {
-    matrix matWVP;
+    row_major matrix matWVP;
 }

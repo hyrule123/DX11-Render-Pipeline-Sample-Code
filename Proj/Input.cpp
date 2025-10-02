@@ -42,7 +42,7 @@ Input::~Input()
 
 void Input::update()
 {
-	if (NULL != GetFocus())
+	if (g_hWnd == GetFocus())
 	{
 		//Compute keyboard and mouse button status
 		for (UINT16 i = 0; i < eKey::END; ++i)

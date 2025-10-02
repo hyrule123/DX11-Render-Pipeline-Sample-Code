@@ -34,6 +34,7 @@ private:
 	~DX11();
 	
 	void update();
+	void render();
 	
 public:
 	ComPtr<ID3D11Device> get_device() { return m_device; };
@@ -55,12 +56,12 @@ private:
 
 	//void _10_DXLoop_UpdateKey();
 	//void _11_DXLoop_WorldSpaceTransform();		//World Space
-	void _12_DXLoop_ViewSpaceTransform();		//View Space
-	void _13_DXLoop_ProjectionSpaceTransform();	//Projection Space
-	void _14_DXLoop_UpdateBuffer();
-	void _15_DXLoop_SetShader();
-	void _16_DXLoop_DrawCube();
-	void _17_DXLoop_DrawAxis();
+	//void _12_DXLoop_ViewSpaceTransform();		//View Space
+	//void _13_DXLoop_ProjectionSpaceTransform();	//Projection Space
+	//void _14_DXLoop_UpdateBuffer();
+	//void _15_DXLoop_SetShader();
+	//void _16_DXLoop_DrawCube();
+	//void _17_DXLoop_DrawAxis();
 	void _18_DXLoop_FlipSwapChain ();
 
 	
@@ -96,9 +97,5 @@ private:
 
 
 	D3D11_VIEWPORT					ViewPort = {};
-
-
-
-
 };
 

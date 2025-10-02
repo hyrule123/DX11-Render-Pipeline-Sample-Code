@@ -1,18 +1,5 @@
 ﻿#include "DX11.h"
 
-//Shader Include
-#ifdef _DEBUG
-
-#include "ShaderHeader/VertexShader_Debug.h"
-#include "ShaderHeader/PixelShader_Debug.h"
-
-#else
-
-#include "ShaderHeader/VertexShader.h"
-#include "ShaderHeader/PixelShader.h"
-
-#endif
-
 #include "settings.h"
 
 #include "Manager.h"
@@ -47,16 +34,29 @@ DX11::~DX11()
 
 void DX11::update()
 {
-    _10_DXLoop_UpdateKey();
-    _12_DXLoop_ViewSpaceTransform();
-    _11_DXLoop_WorldSpaceTransform();
+    //출력 병합기에 렌더타겟을 지정.
+    m_context->OMSetRenderTargets(1, RTV.GetAddressOf(), DSV.Get());
 
-    _13_DXLoop_ProjectionSpaceTransform();
-    _14_DXLoop_UpdateBuffer();
-    _15_DXLoop_SetShader();
-    _16_DXLoop_DrawCube();
-    _17_DXLoop_DrawAxis();
-    _18_DXLoop_FlipSwapChain();
+    //화면 클리어
+    Vector4 ClearColor = Vector4(0.5f, 0.5f, 0.5f, 1.f);
+    m_context->ClearRenderTargetView(RTV.Get(), reinterpret_cast<const FLOAT*>(&ClearColor));
+    m_context->ClearDepthStencilView(DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
+
+    //_10_DXLoop_UpdateKey();
+    //_12_DXLoop_ViewSpaceTransform();
+    //_11_DXLoop_WorldSpaceTransform();
+
+    //_13_DXLoop_ProjectionSpaceTransform();
+    //_14_DXLoop_UpdateBuffer();
+    //_15_DXLoop_SetShader();
+    //_16_DXLoop_DrawCube();
+    //_17_DXLoop_DrawAxis();
+    //_18_DXLoop_FlipSwapChain();
+}
+
+void DX11::render()
+{
+    SwapChain->Present(1, 0);
 }
 
 void DX11::_0_DXInit_DeviceContext()
@@ -169,142 +169,6 @@ void DX11::_5_DXInit_CreateSampler()
     SamDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
     SamDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
     m_device->CreateSamplerState(&SamDesc, Sampler.GetAddressOf());
-}
-
-void DX11::_12_DXLoop_ViewSpaceTransform()
-{
-    //ViewMatrix 
-    // = (RotationMatrix * TranslationMatrix)^(-1)
-    // = (TranslationMatrix^(-1) * RotationMatrix^(-1))          
-
-    //TranslationMatrix^(-1) = 
-    /*
-    {
-    1
-        1
-            1   
-    -x  -y  -z  1
-    }
-    = TranslationMatrix(-m_position)
-    */
-    Matrix CameraTranslationMatrix = Matrix::CreateTranslation(-CameraPosition);
-   
-
-    //Roll
-    Matrix CameraRotationMatrixZ = XMMatrixRotationZ(CameraRotation.z);
-
-    //Pitch
-    Matrix CameraRotationMatrixX = XMMatrixRotationX(CameraRotation.x);
-
-    //Yaw
-    Matrix CameraRotationMatrixY = XMMatrixRotationY(CameraRotation.y);
-
-    //The order of transformations is roll first, then pitch, then yaw.
-    ////R(View) = (R(Z) * R(X) * R(Y))^(-1) = R(Y)^(-1) * R(X)^(-1) * R(Z)^(-1)
-    //(R * T)^(-1)
-    matCameraRotation = CameraRotationMatrixZ * CameraRotationMatrixX * CameraRotationMatrixY;
-    
-    matCameraRotation = XMMatrixRotationRollPitchYawFromVector(CameraRotation);
-
-
-    ////Calculate camera direction(For move camera)
-    //Vector3 BasisDir[3] =
-    //{
-    //    Vector3(1.f, 0.f, 0.f),
-    //    Vector3(0.f, 1.f, 0.f),
-    //    Vector3(0.f, 0.f, 1.f)
-    //};
-
-    //for (int i = 0; i < eDIREND; ++i)
-    //{
-    //    //Calculate how much each basis vector is rotated
-    //    CameraDirection[i] = XMVector3TransformNormal(BasisDir[i], CameraRotationMatrix);
-    //}
-
-    //You can rotate reverse by transposed CubeRotation matrix
-    //Characteristics of CubeRotation matrix = orthographic matrix
-    //Characteristics of orthographic matrix = Its inverse matrix is ​​its transpose matrix.
-    //CameraRotationMatrix.Transpose();
-
-    //(Translationmatrix^(-1) * RotationMatrix^(-1))   
-    Matrix matRotInv = matCameraRotation.Transpose();
-    
-    ViewMatrix = CameraTranslationMatrix * matRotInv;
-}
-
-void DX11::_13_DXLoop_ProjectionSpaceTransform()
-{
-    AspectRatio = m_resolution.x / m_resolution.y;
-    FieldOfView = XM_PI / 3.f;
-
-    float NearPlane = 1.f;
-    float FarPlane = 10000.f;
-
-    ProjectionMatrix = XMMatrixPerspectiveFovLH(FieldOfView, AspectRatio, NearPlane, FarPlane);
-}
-
-void DX11::_14_DXLoop_UpdateBuffer()
-{
-    Matrix WorldViewProjectionMatrix = WorldMatrix * ViewMatrix * ProjectionMatrix;
-    WorldViewProjectionMatrix = WorldViewProjectionMatrix.Transpose();
-
-    D3D11_MAPPED_SUBRESOURCE SubRes = {};
-    if (!FAILED(m_context->Map(CB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &SubRes)))
-    {
-        memcpy_s(SubRes.pData, sizeof(Matrix), static_cast<void*>(&WorldViewProjectionMatrix), sizeof(Matrix));
-        m_context->Unmap(CB.Get(), 0);
-    }
-
-    m_context->VSSetConstantBuffers(0, 1, CB.GetAddressOf());
-}
-
-void DX11::_15_DXLoop_SetShader()
-{
-    //출력 병합기에 새 렌더타겟을 등록.
-    m_context->OMSetRenderTargets(1, RTV.GetAddressOf(), DSV.Get());
-
-    //화면 클리어
-    Vector4 ClearColor = Vector4(0.5f, 0.5f, 0.5f, 1.f);
-    m_context->ClearRenderTargetView(RTV.Get(), ClearColor);
-    m_context->ClearDepthStencilView(DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
-
-    //입력 조립기에 레이아웃을 등록
-    m_context->IASetInputLayout(InputLayout.Get());
-
-    m_context->VSSetShader(VS.Get(), nullptr, 0);
-    m_context->PSSetShader(PS.Get(), nullptr, 0);
-}
-
-void DX11::_16_DXLoop_DrawCube()
-{
-    m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    UINT VBStride = sizeof(Vertex);
-    UINT VBOffset = 0;
-    m_context->IASetVertexBuffers(0, 1, VBCube.GetAddressOf(), &VBStride, &VBOffset);
-    m_context->IASetIndexBuffer(IBCube.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-    m_context->DrawIndexed(36, 0, 0);
-}
-
-void DX11::_17_DXLoop_DrawAxis()
-{
-    //Set Tolology Linestrip and register Axis Vertex Buffer
-    m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
-    UINT VBStride = sizeof(Vertex);
-    UINT VBOffset = 0;
-    m_context->IASetVertexBuffers(0, 1, VBAxis.GetAddressOf(), &VBStride, &VBOffset);
-
-    m_context->IASetIndexBuffer(IBAxisX.Get(), DXGI_FORMAT_R32_UINT, 0);
-    m_context->DrawIndexed(2, 0, 0);
-    m_context->IASetIndexBuffer(IBAxisY.Get(), DXGI_FORMAT_R32_UINT, 0);
-    m_context->DrawIndexed(2, 0, 0);
-    m_context->IASetIndexBuffer(IBAxisZ.Get(), DXGI_FORMAT_R32_UINT, 0);
-    m_context->DrawIndexed(2, 0, 0);
-}
-
-void DX11::_18_DXLoop_FlipSwapChain()
-{
-    SwapChain->Present(1, 0);
 }
 
 void DX11::set_resolution(const Vector2& _size)

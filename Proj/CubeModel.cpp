@@ -12,11 +12,65 @@ CubeModel::CubeModel()
 
 void CubeModel::init()
 {
+    create_input_assembler();
+    create_shader();
+    create_const_buffer();
+    create_cube_mesh();
+    create_axis_mesh();
 }
 
 
 CubeModel::~CubeModel()
 {
+}
+
+void CubeModel::render(const Matrix& _WVP)
+{
+    DX11& dx = Manager::get_inst().get_DX11_inst();
+    ComPtr<ID3D11DeviceContext> context = dx.get_context();
+
+    {
+        //입력 조립기에 레이아웃을 등록
+        context->IASetInputLayout(InputLayout.Get());
+
+        context->VSSetShader(VS.Get(), nullptr, 0);
+        context->PSSetShader(PS.Get(), nullptr, 0);
+
+        context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        UINT VBStride = sizeof(Vertex);
+        UINT VBOffset = 0;
+        context->IASetVertexBuffers(0, 1, VBCube.GetAddressOf(), &VBStride, &VBOffset);
+        context->IASetIndexBuffer(IBCube.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+        //상수버퍼에 WVP 행렬 데이터를 전송
+        D3D11_MAPPED_SUBRESOURCE SubRes = {};
+        if (!FAILED(dx.get_context()->Map(CB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &SubRes)))
+        {
+            memcpy_s(SubRes.pData, sizeof(Matrix), static_cast<const void*>(&_WVP), sizeof(Matrix));
+            context->Unmap(CB.Get(), 0);
+        }
+
+        context->VSSetConstantBuffers(0, 1, CB.GetAddressOf());
+
+        //그리기 명령(드로우콜)
+        context->DrawIndexed(36, 0, 0);
+    }
+
+    {
+        //축 렌더링
+        //Set Tolology Linestrip and register Axis Vertex Buffer
+        context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+        UINT VBStride = sizeof(Vertex);
+        UINT VBOffset = 0;
+        context->IASetVertexBuffers(0, 1, VBAxis.GetAddressOf(), &VBStride, &VBOffset);
+
+        context->IASetIndexBuffer(IBAxisX.Get(), DXGI_FORMAT_R32_UINT, 0);
+        context->DrawIndexed(2, 0, 0);
+        context->IASetIndexBuffer(IBAxisY.Get(), DXGI_FORMAT_R32_UINT, 0);
+        context->DrawIndexed(2, 0, 0);
+        context->IASetIndexBuffer(IBAxisZ.Get(), DXGI_FORMAT_R32_UINT, 0);
+        context->DrawIndexed(2, 0, 0);
+    }
 }
 
 void CubeModel::create_input_assembler()

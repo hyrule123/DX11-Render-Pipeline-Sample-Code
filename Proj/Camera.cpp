@@ -7,13 +7,18 @@
 
 #include "MyMath.h"
 
+#include "CubeModel.h"
+#include "CubeWorld.h"
+
 
 Camera::Camera() {}
 
 void Camera::init()
 {
 	const Vector2 res = Manager::get_inst().get_DX11_inst().get_resolution();
+
 	m_aspect_ratio = res.x / res.y;
+
 	m_field_of_view = DEFAULT_FOV;
 	m_Z_near = DEFAULT_Z_NEAR;
 	m_Z_far = DEFAULT_Z_FAR;
@@ -41,11 +46,11 @@ Camera::~Camera()
 
 void Camera::update()
 {
-	Matrix rot_mat = MyMath::get_rotation_matrix(m_rotation);
+	m_rot_matrix = MyMath::get_rotation_matrix(m_rotation);
 
-	Vector3 Forward = rot_mat.Forward();
-	Vector3 Right = rot_mat.Right();
-	Vector3 Up = rot_mat.Up();
+	Vector3 Forward = m_rot_matrix.Forward();
+	Vector3 Right = m_rot_matrix.Right();
+	Vector3 Up = m_rot_matrix.Up();
 
 	Input& input = Manager::get_inst().get_Input_inst();
 	float deltatime = Manager::get_inst().get_Timer_inst().get_deltatime();
@@ -66,6 +71,21 @@ void Camera::update()
 	{
 		m_position += Right * 100.f * deltatime;
 	}
+
+	if (input.GetKeyPressed(eKey::MOUSE_RBUTTON))
+	{
+		Vector2 dir = input.GetMouseDir();
+
+		Quaternion x_quat = MyMath::get_quaternion(Vector3::UnitX, dir.y * deltatime);
+		Quaternion y_quat = MyMath::get_quaternion(Vector3::UnitY, dir.x * deltatime);
+
+		m_rotation = m_rotation * x_quat * y_quat;
+	}
+}
+
+void Camera::render(CubeWorld* _world)
+{
+	_world->render(m_view_matrix, m_projection_matrix);
 }
 
 void Camera::calculate_view_matrix()
@@ -80,34 +100,7 @@ void Camera::calculate_view_matrix()
 	rot_quat_inv.Normalize();	//정규화해서 단위 사원수로 변환
 	rot_quat_inv.Conjugate();	//단위 사원수의 역원은 켤레 사원수!, 켤레 사원수는 기존의 회전을 반대로 회전시킨다.
 	
-
-#define a w //scalar part
-#define b x
-#define c y
-#define d z
-
-	Matrix rot_mat_inv = Matrix::Identity;
-
-	//MATRIX ROW 1
-	rot_mat_inv.m[0][0] = 1.f - 2.f * (rot_quat_inv.c * rot_quat_inv.c + rot_quat_inv.d * rot_quat_inv.d);
-	rot_mat_inv.m[0][1] = 2.f * (rot_quat_inv.a * rot_quat_inv.d + rot_quat_inv.b * rot_quat_inv.c);
-	rot_mat_inv.m[0][2] = 2.f * (rot_quat_inv.b * rot_quat_inv.d - rot_quat_inv.a * rot_quat_inv.c);
-
-	//MATRIX ROW 2
-	rot_mat_inv.m[1][0] = 2.f * (rot_quat_inv.b * rot_quat_inv.c - rot_quat_inv.a * rot_quat_inv.d);
-	rot_mat_inv.m[1][1] = 1.f - 2.f * (rot_quat_inv.b * rot_quat_inv.b + rot_quat_inv.d * rot_quat_inv.d);
-	rot_mat_inv.m[1][2] = 2.f * (rot_quat_inv.a * rot_quat_inv.b + rot_quat_inv.c * rot_quat_inv.d);
-
-	//MATRIX ROW 3
-	rot_mat_inv.m[2][0] = 2.f * (rot_quat_inv.a * rot_quat_inv.c + rot_quat_inv.b * rot_quat_inv.d);
-	rot_mat_inv.m[2][1] = 2.f * (rot_quat_inv.c * rot_quat_inv.d - rot_quat_inv.a * rot_quat_inv.b);
-	rot_mat_inv.m[2][2] = 1.f - 2.f * (rot_quat_inv.b * rot_quat_inv.b + rot_quat_inv.c * rot_quat_inv.c);
-
-#undef a
-#undef b
-#undef c
-#undef d
-
+	Matrix rot_mat_inv = MyMath::get_rotation_matrix(rot_quat_inv);
 
 	//V = (T * R)^-1 = R^-1 * T^-1
 	m_view_matrix = rot_mat_inv * pos_mat_inv;

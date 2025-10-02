@@ -14,15 +14,18 @@ public:
 
 	~Scene();
 
-	void update();
+	Scene(const Scene&) = delete;
+	Scene(Scene&&) = delete;
 
-	CubeModel* get_cube_model() { return m_cube_model.get(); }
-	CubeWorld* get_cube_world() { return m_cube_world.get(); }
-	Camera* get_camera() { return m_camera.get(); }
+	void update();
+	void render();
+
+	CubeWorld* get_cube_world() { return m_cube_world; }
+	Camera* get_camera() { return m_camera; }
 
 private:
-	std::unique_ptr<CubeModel> m_cube_model = {};
-	std::unique_ptr<CubeWorld> m_cube_world = {};
-	std::unique_ptr<Camera> m_camera = {};
+	std::shared_ptr<CubeModel> m_cube_model = {};
+	CubeWorld* m_cube_world = {};
+	Camera* m_camera = {};
 };
 

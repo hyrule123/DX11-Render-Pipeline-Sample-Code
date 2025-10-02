@@ -5,24 +5,19 @@
 #include "Timer.h"
 #include "Scene.h"
 
-Manager::Manager() {}
-
-Manager::~Manager()
+Manager::Manager() 
 {
-	m_input.reset();
-	m_timer.reset();
-	m_dx.reset();
 }
 
 void Manager::init()
 {
-	m_input = std::make_unique<Input>();
+	m_input = new Input;
 	m_input->init();
 
-	m_timer = std::make_unique<Timer>();
+	m_timer = new Timer;
 	m_timer->init();
 
-	m_dx = std::make_unique<DX11>();
+	m_dx = new DX11;
 	m_dx->init();
 
 	 RECT WINSIZE = {};
@@ -35,6 +30,17 @@ void Manager::init()
 	AdjustWindowRect(&WINSIZE, WS_OVERLAPPEDWINDOW, false);
 	SetWindowPos(g_hWnd, nullptr, 100, 100, WINSIZE.right - WINSIZE.left, WINSIZE.bottom - WINSIZE.top, 0);
 	ShowWindow(g_hWnd, true);
+
+	m_scene = new Scene;
+	m_scene->init();
+}
+
+Manager::~Manager()
+{
+	SAFE_DELETE(m_scene);
+	SAFE_DELETE(m_dx);
+	SAFE_DELETE(m_input);
+	SAFE_DELETE(m_timer);
 }
 
 void Manager::run()
@@ -42,4 +48,9 @@ void Manager::run()
 	m_timer->update();
 	m_input->update();
 	m_scene->update();
+
+	m_dx->update();
+
+	m_scene->render();
+	m_dx->render();
 }

@@ -1,7 +1,8 @@
 #pragma once
 #include "global.h"
 
-
+class CubeModel;
+class CubeWorld;
 
 class Camera
 {
@@ -13,6 +14,11 @@ public:
 
 public:
 	void update();
+
+	void render(CubeWorld* _world);
+
+	const Quaternion& get_rotataion() const { return m_rotation; }
+	const Matrix& get_rotation_matrix() const { return m_rot_matrix; }
 
 private:
 	void calculate_view_matrix();
@@ -28,6 +34,7 @@ private:
 
 	Vector3	m_position = {};
 	Quaternion	m_rotation = {};
+	Matrix m_rot_matrix = {};
 
 	Matrix	m_view_matrix = {};
 	Matrix	m_projection_matrix = {};
