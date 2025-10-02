@@ -55,21 +55,26 @@ void Camera::update()
 	Input& input = Manager::get_inst().get_Input_inst();
 	float deltatime = Manager::get_inst().get_Timer_inst().get_deltatime();
 
+	bool is_transform_changed = false;
 	if (input.GetKeyPressed(eKey::W))
 	{
 		m_position += Forward * 100.f * deltatime;
+		is_transform_changed = true;
 	}
 	if (input.GetKeyPressed(eKey::S))
 	{
 		m_position -= Forward * 100.f * deltatime;
+		is_transform_changed = true;
 	}
 	if (input.GetKeyPressed(eKey::A))
 	{
 		m_position -= Right * 100.f * deltatime;
+		is_transform_changed = true;
 	}
 	if (input.GetKeyPressed(eKey::D))
 	{
 		m_position += Right * 100.f * deltatime;
+		is_transform_changed = true;
 	}
 
 	if (input.GetKeyPressed(eKey::MOUSE_RBUTTON))
@@ -80,6 +85,14 @@ void Camera::update()
 		Quaternion y_quat = MyMath::get_quaternion(Vector3::UnitY, dir.x * deltatime);
 
 		m_rotation = m_rotation * x_quat * y_quat;
+
+		is_transform_changed = true;
+	}
+	
+	//트랜스폼에 변화가 있었다면 뷰 행렬을 새로 계산한다.
+	if (is_transform_changed)
+	{
+		calculate_view_matrix();
 	}
 }
 
@@ -102,9 +115,8 @@ void Camera::calculate_view_matrix()
 	
 	Matrix rot_mat_inv = MyMath::get_rotation_matrix(rot_quat_inv);
 
-	//V = (T * R)^-1 = R^-1 * T^-1
-	m_view_matrix = rot_mat_inv * pos_mat_inv;
-
+	//V = (R * T)^-1 = T^-1 * R ^ -1
+	m_view_matrix = pos_mat_inv * rot_mat_inv;
 
 	//RH -> LH
 	//Z축을 반전시켜주어야 함!
