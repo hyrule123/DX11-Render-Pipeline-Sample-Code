@@ -40,6 +40,8 @@ public:
 	ComPtr<ID3D11Device> get_device() { return m_device; };
 	ComPtr<ID3D11DeviceContext> get_context() { return m_context; }
 
+	ComPtr<ID3D11RasterizerState> get_rs_state() { return RSState; }
+
 	Vector2 get_resolution() const { return m_resolution; }
 
 private:
@@ -48,6 +50,7 @@ private:
 	void _1_DXInit_CreateSwapChain();
 	void _2_DXInit_CreateRenderTargetView();
 	//void _3_DXInit_CreateInputAssembler();
+	void DXInit_CreateRasterizerState();
 	void _4_DXInit_CreateBlendState();
 	void _5_DXInit_CreateSampler();
 	//void _6_DXInit_CreateDefaultGraphicsShader();

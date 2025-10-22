@@ -17,6 +17,7 @@ private:
 	void create_shader();
 	void create_const_buffer();
 	void create_cube_mesh();
+	void create_pyramid_mesh();
 	void create_axis_mesh();
 	
 

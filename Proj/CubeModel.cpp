@@ -15,7 +15,8 @@ void CubeModel::init()
     create_input_assembler();
     create_shader();
     create_const_buffer();
-    create_cube_mesh();
+    //create_cube_mesh();
+    create_pyramid_mesh();
     create_axis_mesh();
 }
 
@@ -26,6 +27,17 @@ CubeModel::~CubeModel()
 
 void CubeModel::render(const Matrix& _WVP)
 {
+    std::vector<Vector4> wvps;
+
+    for (auto& vb : vecVBCube)
+    {
+        Vector4 v = Vector4(vb.vPos, 1.f);
+
+        Vector4 proj = Vector4::Transform(v, _WVP);
+
+        wvps.push_back(proj);
+    }
+
     DX11& dx = Manager::get_inst().get_DX11_inst();
     ComPtr<ID3D11DeviceContext> context = dx.get_context();
 
@@ -53,7 +65,7 @@ void CubeModel::render(const Matrix& _WVP)
         context->VSSetConstantBuffers(0, 1, CB.GetAddressOf());
 
         //그리기 명령(드로우콜)
-        context->DrawIndexed(36, 0, 0);
+        context->DrawIndexed((UINT)vecIBCube.size(), 0, 0);
     }
 
     {
@@ -130,6 +142,9 @@ void CubeModel::create_cube_mesh()
     DX11& dx = Manager::get_inst().get_DX11_inst();
     ComPtr<ID3D11Device> device = dx.get_device();
 
+    vecVBCube.clear();
+    vecIBCube.clear();
+
     //정점정보 생성
     Vertex v = {};
 
@@ -180,7 +195,6 @@ void CubeModel::create_cube_mesh()
     CHKFAIL(device->CreateBuffer(&VBDesc, &VtxData, VBCube.GetAddressOf()));
 
     //인덱스 정보 생성
-    /*
     UINT arrIB[] = {
         0, 1, 2,
         0, 2, 3,
@@ -200,10 +214,10 @@ void CubeModel::create_cube_mesh()
         5, 4, 7,
         5, 7, 6
     };
-    */
     
     //오른손 좌표계와 왼손 좌표계는 Z축이 반전되어 있다
     //따라서 외적의 결과도 반대 방향이 되어야 하므로 index 순서를 시계 방향에서 반시계 방향으로 교체한다.
+    /*
     UINT arrIB[] = {
     0, 2, 1,
     0, 3, 2,
@@ -223,8 +237,97 @@ void CubeModel::create_cube_mesh()
     5, 7, 4,
     5, 6, 7
     };
+    */
 
     vecIBCube.insert(vecIBCube.begin(), arrIB, arrIB + 36);
+
+    //인덱스 버퍼 생성
+    D3D11_BUFFER_DESC IBDesc = {};
+    IBDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    IBDesc.CPUAccessFlags = 0;
+    IBDesc.Usage = D3D11_USAGE_DEFAULT;
+    IBDesc.ByteWidth = (UINT)(vecIBCube.size() * sizeof(UINT));
+
+    D3D11_SUBRESOURCE_DATA IdxData = {};
+    IdxData.pSysMem = (void*)vecIBCube.data();
+
+    CHKFAIL(device->CreateBuffer(&IBDesc, &IdxData, IBCube.GetAddressOf()));
+}
+
+void CubeModel::create_pyramid_mesh()
+{
+    DX11& dx = Manager::get_inst().get_DX11_inst();
+    ComPtr<ID3D11Device> device = dx.get_device();
+
+    vecVBCube.clear();
+    vecIBCube.clear();
+
+    //정점정보 생성
+    Vertex v = {};
+
+    v.vPos = Vector3(0.0f, 0.f, 0.f);
+    v.vColor = Vector4(0.f, 0.f, 0.f, 1.f);
+    vecVBCube.push_back(v);
+
+    v.vPos = Vector3(0.5f, 0.f, 1.f);
+    v.vColor = Vector4(1.f, 0.f, 0.f, 1.f);
+    vecVBCube.push_back(v);
+
+    v.vPos = Vector3(0.f, 1.f, 1.f);
+    v.vColor = Vector4(0.f, 1.f, 0.f, 1.f);
+    vecVBCube.push_back(v);
+
+    v.vPos = Vector3(0.f, 0.f, 1.f);
+    v.vColor = Vector4(0.f, 0, 1.f, 1.f);
+    vecVBCube.push_back(v);
+
+    //정점버퍼 생성
+    D3D11_BUFFER_DESC VBDesc = {};
+    VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    VBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    VBDesc.Usage = D3D11_USAGE_DYNAMIC;
+
+    VBDesc.ByteWidth = (UINT)(sizeof(Vertex) * vecVBCube.size());
+
+    D3D11_SUBRESOURCE_DATA VtxData = {};
+    VtxData.pSysMem = (void*)vecVBCube.data();
+
+    CHKFAIL(device->CreateBuffer(&VBDesc, &VtxData, VBCube.GetAddressOf()));
+
+    //인덱스 정보 생성
+    
+    //UINT arrIB[] = { 
+    //    0, 1, 2,
+    //    0, 2, 3,
+    //    0, 3, 1,
+    //    1, 3, 2
+    //};
+
+    UINT arrIB[] = {
+    0, 2, 1,
+    0, 3, 2,
+    0, 1, 3,
+    1, 2, 3
+    };
+    
+    Vector3 V1 = Vector3(0.5, 0, 1);
+    Vector3 V2 = Vector3(0, 0, 1);
+    Vector3 V3 = Vector3(0, 1, 1);
+
+    Vector3 l1 = V2 - V1;
+    Vector3 l2 = V3 - V2;
+    Vector3 cross = l1.Cross(l2);
+
+    //오른손 좌표계와 왼손 좌표계는 Z축이 반전되어 있다
+    //따라서 외적의 결과도 반대 방향이 되어야 하므로 index 순서를 시계 방향에서 반시계 방향으로 교체한다.
+    //UINT arrIB[] = {
+    //    0, 2, 1,
+    //    0, 3, 2,
+    //    0, 1, 3,
+    //    3, 1, 2
+    //};
+
+    vecIBCube.insert(vecIBCube.begin(), arrIB, arrIB + (sizeof(arrIB) / sizeof(UINT)));
 
     //인덱스 버퍼 생성
     D3D11_BUFFER_DESC IBDesc = {};

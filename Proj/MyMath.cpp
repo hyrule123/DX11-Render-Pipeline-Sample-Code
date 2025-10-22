@@ -40,6 +40,55 @@ end{bmatrix}
     return rot_mat;
 }
 
+Matrix MyMath::get_perspective_projection_matrix(float _n, float _f, float _fovY_deg, float _aspect_ratio)
+{
+	Matrix proj = Matrix::Identity;
+	proj._11 = proj._22 = proj._33 = proj._44 = 0.f;
+
+	/*
+\therefore M_{proj} = \begin{bmatrix}
+\frac{1}{\tan{(\frac{\gamma}{2})} \cdot \frac{w}{h} } & 0 & 0 & 0 \\
+0 & \frac{1}{\tan{(\frac{\gamma}{2})}  } & 0 & 0 \\
+0 & 0 & -\frac{f}{f-n} & -1\\
+0 & 0 & -\frac{fn}{f-n}  & 0
+\end{bmatrix}\\
+\gamma = \text{FOV}\\
+n = \text{near plane}\\
+f = \text{far plane}
+	*/
+
+	float _fovY_rad = MyMath::to_radian(_fovY_deg);
+	proj._11 = 1.f / (std::tan(_fovY_rad / 2.f) * _aspect_ratio);	// 참고: 1/tan 은 atan으로 대체 가능
+	proj._22 = 1.f / (std::tan(_fovY_rad / 2.f));
+	proj._33 = -(_f / (_f - _n));	proj._34 = -1;
+	proj._43 = -(_f * _n / (_f - _n));
+
+	return proj;
+}
+
+Matrix MyMath::get_orthographic_projection_matrix(float _n, float _f, float _width, float _height)
+{
+	Matrix ortho = Matrix::Identity;
+
+	/*
+P_{ortho} = 
+\begin{bmatrix}
+\frac{2}{W_{rect}} & & &\\
+ & \frac{2}{H_{rect}} & & \\
+ & & -\frac{1}{f - n} & \\
+ & & -\frac{n}{f - n} & 1 \\
+\end{bmatrix}\\
+\text{cf)} W_{rect}, H_{rect}: \text{직육면체 변의 길이}
+	*/
+	
+	ortho._11 = 2.f / _width;
+	ortho._22 = 2.f / _height;
+	ortho._33 = -(1.f / (_f - _n));
+	ortho._43 = -(_n / (_f - _n));
+
+	return ortho;
+}
+
 Quaternion MyMath::get_quaternion(Vector3 _axis, float _radian)
 {
 	Quaternion ret;

@@ -19,7 +19,7 @@ void Camera::init()
 
 	m_aspect_ratio = res.x / res.y;
 
-	m_field_of_view = DEFAULT_FOV;
+	m_fov_deg = DEFAULT_FOV;
 	m_Z_near = DEFAULT_Z_NEAR;
 	m_Z_far = DEFAULT_Z_FAR;
 	m_position = Vector3{ DEFAULT_CAM_POS_X, DEFAULT_CAM_POS_Y, DEFAULT_CAM_POS_Z };
@@ -58,12 +58,12 @@ void Camera::update()
 	bool is_transform_changed = false;
 	if (input.GetKeyPressed(eKey::W))
 	{
-		m_position += Forward * 100.f * deltatime;
+		m_position -= Forward * 100.f * deltatime;
 		is_transform_changed = true;
 	}
 	if (input.GetKeyPressed(eKey::S))
 	{
-		m_position -= Forward * 100.f * deltatime;
+		m_position += Forward * 100.f * deltatime;
 		is_transform_changed = true;
 	}
 	if (input.GetKeyPressed(eKey::A))
@@ -79,12 +79,29 @@ void Camera::update()
 
 	if (input.GetKeyPressed(eKey::MOUSE_RBUTTON))
 	{
-		Vector2 dir = input.GetMouseDir();
+		/*
+<-Y축 회전-> yaw(커서의 X 변화량)
+	|
+	|            ↑
+	|________ X축 회전, pitch(커서의 Y 변화량)
+				 ↓
 
-		Quaternion x_quat = MyMath::get_quaternion(Vector3::UnitX, dir.y * deltatime);
-		Quaternion y_quat = MyMath::get_quaternion(Vector3::UnitY, dir.x * deltatime);
+	* RH 기준이므로,
+	마우스 X+ -> Y축 yaw +방향 회전 (정방향)
+	마우스 Y- -> X축 pitch +방향 회전 (역방향: 부호 변환 필요)
+	*/
+		Vector2 dir = input.GetMouseDir() * deltatime * 30.f;
+		m_pitchyaw_degree.x -= dir.y;
+		m_pitchyaw_degree.y += dir.x;
 
-		m_rotation = m_rotation * x_quat * y_quat;
+		//pitch clamp( -89 ~ 89 )
+		if (m_pitchyaw_degree.x < -89.f) { m_pitchyaw_degree.x = -89.f; }
+		if (m_pitchyaw_degree.x > 89.f) { m_pitchyaw_degree.x = 89.f; }
+
+		Quaternion x_quat = MyMath::get_quaternion(Vector3::Right, MyMath::to_radian(m_pitchyaw_degree.x));
+		Quaternion y_quat = MyMath::get_quaternion(Vector3::Up, MyMath::to_radian(m_pitchyaw_degree.y));
+
+		m_rotation = x_quat * y_quat;
 
 		is_transform_changed = true;
 	}
@@ -93,6 +110,17 @@ void Camera::update()
 	if (is_transform_changed)
 	{
 		calculate_view_matrix();
+	}
+
+
+	//Projection Matrix
+	if (eProjMode::Projection == m_projection_mode)
+	{
+		calculate_persp_proj_matrix();
+	}
+	else if (eProjMode::Orthographic == m_projection_mode)
+	{
+		calculate_ortho_proj_matrix();
 	}
 }
 
@@ -120,38 +148,25 @@ void Camera::calculate_view_matrix()
 
 	//RH -> LH
 	//Z축을 반전시켜주어야 함!
-	m_view_matrix._31 = -m_view_matrix._31;
-	m_view_matrix._32 = -m_view_matrix._32;
-	m_view_matrix._33 = -m_view_matrix._33;
-	m_view_matrix._34 = -m_view_matrix._34;
+	//m_view_matrix._31 = -m_view_matrix._31;
+	//m_view_matrix._32 = -m_view_matrix._32;
+	//m_view_matrix._33 = -m_view_matrix._33;
+	//m_view_matrix._34 = -m_view_matrix._34;
 }
 
 void Camera::calculate_ortho_proj_matrix()
 {
-	m_projection_matrix = Matrix::Identity;
-
 	Vector2 res = Manager::get_inst().get_DX11_inst().get_resolution();
 
-	m_projection_matrix.m[0][0] = 2.f / res.x;
-	m_projection_matrix.m[1][1] = 2.f / res.y;
-
-	m_projection_matrix.m[2][2] = 1.f / (m_Z_far - m_Z_near);
-	m_projection_matrix.m[3][2] = -m_Z_near / (m_Z_far - m_Z_near);
+	m_projection_matrix = MyMath::get_orthographic_projection_matrix(m_Z_near, m_Z_far, res.x, res.y);
 }
 
 void Camera::calculate_persp_proj_matrix()
 {
-	m_projection_matrix = Matrix::Identity;
+	DX11& dx = Manager::get_inst().get_DX11_inst();
+	Vector2 res = dx.get_resolution();
+	m_aspect_ratio = res.x / res.y;
 
-	float fov_half = m_field_of_view / 2.f;
-	float tan_fov = std::tan(fov_half);
-
-	m_projection_matrix.m[0][0] = 1.f / (tan_fov * m_aspect_ratio);
-	m_projection_matrix.m[1][1] = 1.f / tan_fov;
-
-	m_projection_matrix.m[2][2] = m_Z_far / (m_Z_far - m_Z_near);
-	m_projection_matrix.m[2][3] = 1.f;
-
-	m_projection_matrix.m[3][2] = (-1.f * m_Z_far * m_Z_near) / (m_Z_far - m_Z_near);
+	m_projection_matrix = MyMath::get_perspective_projection_matrix(m_Z_near, m_Z_far, m_fov_deg, m_aspect_ratio);
 }
 

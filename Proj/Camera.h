@@ -28,7 +28,7 @@ private:
 private:
 	//Camera
 	float	m_aspect_ratio = {};
-	float	m_field_of_view = {};	//FOV
+	float	m_fov_deg = {};	//FOV
 	float	m_Z_near = {};
 	float	m_Z_far = {};
 
@@ -39,5 +39,8 @@ private:
 	Matrix	m_view_matrix = {};
 	Matrix	m_projection_matrix = {};
 	eProjMode m_projection_mode = {};
+
+	//회전 관련
+	Vector2 m_pitchyaw_degree;
 };
 

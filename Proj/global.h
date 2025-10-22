@@ -68,7 +68,7 @@ extern HWND g_hWnd;
 extern HINSTANCE g_hInstance;
 
 //1(rad) / 180 * PI = PI / 180
-constexpr const float g_radian_to_degree_factor = DirectX::XM_PI / 180.f;
+constexpr const float g_degree_to_radian_factor = DirectX::XM_PI / 180.f;
 
 //1(deg) / PI * 180 = 180 / PI
-constexpr const float g_degreeToRadianFactor = 180.f / DirectX::XM_PI;
+constexpr const float g_radian_to_degree_factor = 180.f / DirectX::XM_PI;

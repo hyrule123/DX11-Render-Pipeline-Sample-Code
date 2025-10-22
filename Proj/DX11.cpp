@@ -20,6 +20,7 @@ void DX11::init()
     _0_DXInit_DeviceContext();
     _1_DXInit_CreateSwapChain();
     _2_DXInit_CreateRenderTargetView();
+    DXInit_CreateRasterizerState();
     //_3_DXInit_CreateInputAssembler();
     _4_DXInit_CreateBlendState();
     _5_DXInit_CreateSampler();
@@ -154,6 +155,28 @@ void DX11::_2_DXInit_CreateRenderTargetView()
     m_context->RSSetViewports(1, &ViewPort);
 }
 
+
+void DX11::DXInit_CreateRasterizerState()
+{
+    D3D11_RASTERIZER_DESC rasterDesc = {};
+    rasterDesc.FillMode = D3D11_FILL_SOLID;
+
+    rasterDesc.CullMode = D3D11_CULL_BACK;
+
+    //이 부분!!
+    //앞 부분이 CW인지 CCW인지 정의
+    rasterDesc.FrontCounterClockwise = FALSE;
+    // -----------------
+
+    rasterDesc.DepthClipEnable = TRUE;
+
+    HRESULT hr = m_device->CreateRasterizerState(&rasterDesc, RSState.GetAddressOf());
+
+    CHKFAIL(hr);
+
+    //단일 Rasterizer 사용 예정이므로 등록
+    m_context->RSSetState(RSState.Get());
+}
 
 void DX11::_4_DXInit_CreateBlendState()
 {

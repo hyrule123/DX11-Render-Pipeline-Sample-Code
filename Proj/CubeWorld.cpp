@@ -59,7 +59,6 @@ void CubeWorld::update()
 void CubeWorld::render(const Matrix& _view_mat, const Matrix& _proj_mat)
 {
     Matrix WVP = m_world_mat * _view_mat * _proj_mat;
-    
     m_model->render(WVP);
 }
 
@@ -77,14 +76,18 @@ void CubeWorld::rotate_by_cam_view(Camera* _cam, Vector2 _mouse_dir, float _delt
     |           
     |            ↑
     |________ X축 회전(커서의 Y 변화량)
-    */ //        ↓
+                 ↓
 
+    * RH 기준이므로, 
+    마우스 X+ -> Y축 +방향 회전 (정방향)
+    마우스 Y- -> X축 +방향 회전 (역방향: 부호 변환 필요)
+    */
     //직접 사원수 만들어 보기
 
     //회전량을 구한다
     //마우스를 위로 드래그하면 앞으로 굴러가는 게 직관적
     //X축이 바라보는 방향 기준 반시계 방향이므로, 음수 방향으로 회전해야 함
-    float theta_x = - _mouse_dir.y * _deltatime;
+    float theta_x = -_mouse_dir.y * _deltatime;
     Vector3 axis_x = Vector3{ rot_mat._11, rot_mat._12, rot_mat._13 };
     Quaternion x_quat = MyMath::get_quaternion(axis_x, theta_x);
     
