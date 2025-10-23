@@ -40,65 +40,65 @@ public:
 	ComPtr<ID3D11Device> get_device() { return m_device; };
 	ComPtr<ID3D11DeviceContext> get_context() { return m_context; }
 
-	ComPtr<ID3D11RasterizerState> get_rs_state() { return RSState; }
+	ComPtr<ID3D11RasterizerState> get_rs_state() { return m_rasterizer_state; }
 
-	Vector2 get_resolution() const { return m_resolution; }
+	UINT get_width() const { return m_res_width; }
+	UINT get_height() const { return m_res_height; }
 
 private:
 //========= DXE ===================
-	void _0_DXInit_DeviceContext();
-	void _1_DXInit_CreateSwapChain();
-	void _2_DXInit_CreateRenderTargetView();
-	//void _3_DXInit_CreateInputAssembler();
-	void DXInit_CreateRasterizerState();
-	void _4_DXInit_CreateBlendState();
-	void _5_DXInit_CreateSampler();
-	//void _6_DXInit_CreateDefaultGraphicsShader();
-	//void _7_DXInit_CreateConstBuffer();
-	//void _8_DXInit_CreateMeshes();				//Local Space
+	void create_device_context();
+	void create_swap_chain();
+	void create_render_target_view();
+	void create_depth_stencil_view();
 
-	//void _10_DXLoop_UpdateKey();
-	//void _11_DXLoop_WorldSpaceTransform();		//World Space
-	//void _12_DXLoop_ViewSpaceTransform();		//View Space
-	//void _13_DXLoop_ProjectionSpaceTransform();	//Projection Space
-	//void _14_DXLoop_UpdateBuffer();
-	//void _15_DXLoop_SetShader();
-	//void _16_DXLoop_DrawCube();
-	//void _17_DXLoop_DrawAxis();
-	void _18_DXLoop_FlipSwapChain ();
+	void create_rasterizer_state();
+	void create_blend_state();
+	void create_sampler();
 
-	
+	//void DXInit_CreateInputAssembler();
+	//void DXInit_CreateDefaultGraphicsShader();
+	//void DXInit_CreateConstBuffer();
+	//void DXInit_CreateMeshes();				//Local Space
+
+	//void DXLoop_UpdateKey();
+	//void DXLoop_WorldSpaceTransform();		//World Space
+	//void DXLoop_ViewSpaceTransform();		//View Space
+	//void DXLoop_ProjectionSpaceTransform();	//Projection Space
+	//void DXLoop_UpdateBuffer();
+	//void DXLoop_SetShader();
+	//void DXLoop_DrawCube();
+	//void DXLoop_DrawAxis();
+	//void DXLoop_FlipSwapChain ();
 
 private:
-	void set_resolution(const Vector2& _size);
+	void set_resolution(UINT _width, UINT _height);
 
 private:
 //==================================== VARIABLES ============================================
-
-	Vector2							m_resolution = {};
+	UINT m_res_width = {};
+	UINT m_res_height = {};
 	
 	ComPtr<ID3D11Device> m_device = {};
 	ComPtr<ID3D11DeviceContext> m_context = {};
-	ComPtr<IDXGISwapChain> SwapChain = {};
-	ComPtr<ID3D11Texture2D>			RTTex = {};
-	ComPtr<ID3D11RenderTargetView>	RTV = {};
+	ComPtr<IDXGISwapChain> m_swapchain = {};
+	ComPtr<ID3D11Texture2D>			m_renter_target_buffer = {};
+	ComPtr<ID3D11RenderTargetView>	m_render_target_view = {};
 
-	ComPtr<ID3D11Texture2D>			DSTex = {};
-	ComPtr<ID3D11DepthStencilView>	DSV = {};
+	ComPtr<ID3D11Texture2D>			m_depth_stencil_buffer = {};
+	ComPtr<ID3D11DepthStencilView>	m_depth_stencil_view = {};
+	ComPtr<ID3D11DepthStencilState>	m_depth_stencil_state = {};
 
-	// Sampler
-	ComPtr<ID3D11SamplerState>		Sampler = {};
+	// m_sampler
+	ComPtr<ID3D11SamplerState>		m_sampler = {};
 
 	// RasterizerState
-	ComPtr<ID3D11RasterizerState>	RSState = {};
-
-	// DepthStencilState
-	ComPtr<ID3D11DepthStencilState>	DSState = {};
+	ComPtr<ID3D11RasterizerState>	m_rasterizer_state = {};
 
 	// BlendState
-	ComPtr<ID3D11BlendState>		BSState = {};
+	ComPtr<ID3D11BlendState>		m_blend_state = {};
 
 
-	D3D11_VIEWPORT					ViewPort = {};
+	D3D11_VIEWPORT					m_viewport = {};
 };
 

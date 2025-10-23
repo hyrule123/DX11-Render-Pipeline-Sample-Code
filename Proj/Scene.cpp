@@ -36,3 +36,8 @@ void Scene::render()
 {
 	m_camera->render(m_cube_world);
 }
+
+void Scene::on_resolution_change(UINT _width, UINT _height)
+{
+	m_camera->on_resolution_change((float)_width, (float)_height);
+}

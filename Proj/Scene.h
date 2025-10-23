@@ -23,6 +23,8 @@ public:
 	CubeWorld* get_cube_world() { return m_cube_world; }
 	Camera* get_camera() { return m_camera; }
 
+	void on_resolution_change(UINT _width, UINT _height);
+
 private:
 	std::shared_ptr<CubeModel> m_cube_model = {};
 	CubeWorld* m_cube_world = {};

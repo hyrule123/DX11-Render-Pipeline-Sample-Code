@@ -15,13 +15,6 @@ Camera::Camera() {}
 
 void Camera::init()
 {
-	const Vector2 res = Manager::get_inst().get_DX11_inst().get_resolution();
-
-	m_aspect_ratio = res.x / res.y;
-
-	m_fov_deg = DEFAULT_FOV;
-	m_Z_near = DEFAULT_Z_NEAR;
-	m_Z_far = DEFAULT_Z_FAR;
 	m_position = Vector3{ DEFAULT_CAM_POS_X, DEFAULT_CAM_POS_Y, DEFAULT_CAM_POS_Z };
 	
 	m_rotation = Quaternion::Identity;
@@ -29,14 +22,8 @@ void Camera::init()
 	calculate_view_matrix();
 	
 	m_projection_mode = eProjMode::Projection;
-	if (eProjMode::Projection == m_projection_mode)
-	{
-		calculate_persp_proj_matrix();
-	}
-	else if (eProjMode::Orthographic == m_projection_mode)
-	{
-		calculate_ortho_proj_matrix();
-	}
+
+	calculate_persp_proj_matrix(DEFAULT_Z_NEAR, DEFAULT_Z_FAR, DEFAULT_FOV, (float)DEFAULT_WIDTH / (float)DEFAULT_HEIGHT);
 }
 
 Camera::~Camera()
@@ -105,28 +92,31 @@ void Camera::update()
 
 		is_transform_changed = true;
 	}
-	
+
 	//트랜스폼에 변화가 있었다면 뷰 행렬을 새로 계산한다.
 	if (is_transform_changed)
 	{
 		calculate_view_matrix();
-	}
-
-
-	//Projection Matrix
-	if (eProjMode::Projection == m_projection_mode)
-	{
-		calculate_persp_proj_matrix();
-	}
-	else if (eProjMode::Orthographic == m_projection_mode)
-	{
-		calculate_ortho_proj_matrix();
 	}
 }
 
 void Camera::render(CubeWorld* _world)
 {
 	_world->render(m_view_matrix, m_projection_matrix);
+}
+
+void Camera::on_resolution_change(float _width, float _height)
+{
+	if (m_projection_mode == eProjMode::Projection)
+	{
+		calculate_persp_proj_matrix(m_near, m_far, m_fov_deg, _width / _height);
+	}
+	else if (m_projection_mode == eProjMode::Orthographic)
+	{
+		float width_half = _width / 2.f;
+		float height_half = _height / 2.f;
+		calculate_ortho_proj_matrix(-width_half, width_half, -height_half, height_half);
+	}
 }
 
 void Camera::calculate_view_matrix()
@@ -154,19 +144,24 @@ void Camera::calculate_view_matrix()
 	//m_view_matrix._34 = -m_view_matrix._34;
 }
 
-void Camera::calculate_ortho_proj_matrix()
+void Camera::calculate_ortho_proj_matrix(float _l, float _r, float _b, float _t)
 {
-	Vector2 res = Manager::get_inst().get_DX11_inst().get_resolution();
-
-	m_projection_matrix = MyMath::get_orthographic_projection_matrix(m_Z_near, m_Z_far, res.x, res.y);
+	//m_projection_matrix = MyMath::get_orthographic_projection_matrix(m_Z_near, m_Z_far, res.x, res.y);
 }
 
-void Camera::calculate_persp_proj_matrix()
+void Camera::calculate_persp_proj_matrix(float _near, float _far, float _fov_deg, float _aspect_ratio)
 {
-	DX11& dx = Manager::get_inst().get_DX11_inst();
-	Vector2 res = dx.get_resolution();
-	m_aspect_ratio = res.x / res.y;
+	assert(0.f < _near);
+	assert(0.f < _far);
+	assert(0.f < _fov_deg);
+	assert(180.f > _fov_deg);
+	assert(0 < _aspect_ratio);
 
-	m_projection_matrix = MyMath::get_perspective_projection_matrix(m_Z_near, m_Z_far, m_fov_deg, m_aspect_ratio);
+	m_near = _near;
+	m_far = _far;
+	m_fov_deg = _fov_deg;
+	m_aspect_ratio = _aspect_ratio;
+
+	m_projection_matrix = MyMath::get_perspective_projection_matrix(m_near, m_far, m_fov_deg, _aspect_ratio);
 }
 

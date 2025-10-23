@@ -33,6 +33,8 @@ public:
 	Input& get_Input_inst() { return *m_input; }
 	Scene& get_Scene_inst() { return *m_scene; }
 
+	void set_winsize(UINT _width, UINT _height);
+
 private:
 	Manager();
 	~Manager();
@@ -50,5 +52,8 @@ private:
 
 	//Scene
 	Scene* m_scene = {};
+
+	UINT m_width = {};
+	UINT m_height = {};
 };
 

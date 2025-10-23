@@ -14,19 +14,11 @@ DX11::DX11()
 
 void DX11::init()
 {
-    m_resolution.x = DEFAULT_WIDTH;
-    m_resolution.y = DEFAULT_HEIGHT;
+    create_device_context();
 
-    _0_DXInit_DeviceContext();
-    _1_DXInit_CreateSwapChain();
-    _2_DXInit_CreateRenderTargetView();
-    DXInit_CreateRasterizerState();
-    //_3_DXInit_CreateInputAssembler();
-    _4_DXInit_CreateBlendState();
-    _5_DXInit_CreateSampler();
-    //_6_DXInit_CreateDefaultGraphicsShader();
-    //_7_DXInit_CreateConstBuffer();
-    //_8_DXInit_CreateMeshes();
+    create_rasterizer_state();
+    create_blend_state();
+    create_sampler();
 }
 
 DX11::~DX11()
@@ -36,31 +28,20 @@ DX11::~DX11()
 void DX11::update()
 {
     //출력 병합기에 렌더타겟을 지정.
-    m_context->OMSetRenderTargets(1, RTV.GetAddressOf(), DSV.Get());
+    m_context->OMSetRenderTargets(1, m_render_target_view.GetAddressOf(), m_depth_stencil_view.Get());
 
     //화면 클리어
     Vector4 ClearColor = Vector4(0.5f, 0.5f, 0.5f, 1.f);
-    m_context->ClearRenderTargetView(RTV.Get(), reinterpret_cast<const FLOAT*>(&ClearColor));
-    m_context->ClearDepthStencilView(DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
-
-    //_10_DXLoop_UpdateKey();
-    //_12_DXLoop_ViewSpaceTransform();
-    //_11_DXLoop_WorldSpaceTransform();
-
-    //_13_DXLoop_ProjectionSpaceTransform();
-    //_14_DXLoop_UpdateBuffer();
-    //_15_DXLoop_SetShader();
-    //_16_DXLoop_DrawCube();
-    //_17_DXLoop_DrawAxis();
-    //_18_DXLoop_FlipSwapChain();
+    m_context->ClearRenderTargetView(m_render_target_view.Get(), reinterpret_cast<const FLOAT*>(&ClearColor));
+    m_context->ClearDepthStencilView(m_depth_stencil_view.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 }
 
 void DX11::render()
 {
-    SwapChain->Present(1, 0);
+    m_swapchain->Present(1, 0);
 }
 
-void DX11::_0_DXInit_DeviceContext()
+void DX11::create_device_context()
 {
     int DXFlag = 0;
 #ifdef _DEBUG
@@ -69,7 +50,7 @@ void DX11::_0_DXInit_DeviceContext()
 
     D3D_FEATURE_LEVEL DXLevel = D3D_FEATURE_LEVEL::D3D_FEATURE_LEVEL_11_0;
 
-    CHKFAIL(D3D11CreateDevice(
+    HRESULT hr = D3D11CreateDevice(
         nullptr,
         D3D_DRIVER_TYPE_HARDWARE,
         nullptr,
@@ -79,11 +60,15 @@ void DX11::_0_DXInit_DeviceContext()
         D3D11_SDK_VERSION,
         m_device.GetAddressOf(), &DXLevel,
         m_context.GetAddressOf()
-    ));
+    );
+
+    CHKFAIL(hr);
 }
 
-void DX11::_1_DXInit_CreateSwapChain()
+void DX11::create_swap_chain()
 {
+    m_swapchain.Reset();
+
     DXGI_SWAP_CHAIN_DESC Desc = {};
 
     Desc.OutputWindow = g_hWnd;
@@ -91,8 +76,8 @@ void DX11::_1_DXInit_CreateSwapChain()
 
     Desc.BufferCount = 2;
     Desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    Desc.BufferDesc.Width = (UINT)m_resolution.x;
-    Desc.BufferDesc.Height = (UINT)m_resolution.y;
+    Desc.BufferDesc.Width = m_res_width;
+    Desc.BufferDesc.Height = m_res_height;
     Desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     Desc.BufferDesc.RefreshRate.Denominator = 1;
     Desc.BufferDesc.RefreshRate.Numerator = 60;
@@ -105,9 +90,9 @@ void DX11::_1_DXInit_CreateSwapChain()
     Desc.SampleDesc.Quality = 0;
     Desc.Flags = 0;
 
-    ComPtr<IDXGIDevice> DXGIDevice;
-    ComPtr<IDXGIAdapter> DXGIAdapter;
-    ComPtr<IDXGIFactory> DXGIFactory;
+    ComPtr<IDXGIDevice> DXGIDevice = nullptr;
+    ComPtr<IDXGIAdapter> DXGIAdapter = nullptr;
+    ComPtr<IDXGIFactory> DXGIFactory = nullptr;
 
     CHKFAIL(m_device->QueryInterface(__uuidof(IDXGIDevice), (void**)DXGIDevice.GetAddressOf()));
 
@@ -115,20 +100,25 @@ void DX11::_1_DXInit_CreateSwapChain()
 
     CHKFAIL(DXGIAdapter->GetParent(__uuidof(IDXGIFactory), (void**)DXGIFactory.GetAddressOf()));
 
-    CHKFAIL(DXGIFactory->CreateSwapChain(m_device.Get(), &Desc, SwapChain.GetAddressOf()));
+    CHKFAIL(DXGIFactory->CreateSwapChain(m_device.Get(), &Desc, m_swapchain.GetAddressOf()));
 }
 
-void DX11::_2_DXInit_CreateRenderTargetView()
+void DX11::create_render_target_view()
 {
-    CHKFAIL(SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)RTTex.GetAddressOf()));
+    if (nullptr == m_swapchain) { assert(false); }
 
-    CHKFAIL(m_device->CreateRenderTargetView(RTTex.Get(), nullptr, RTV.GetAddressOf()));
+    m_render_target_view = nullptr;
+    m_depth_stencil_view = nullptr;
+
+    CHKFAIL(m_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)m_renter_target_buffer.GetAddressOf()));
+
+    CHKFAIL(m_device->CreateRenderTargetView(m_renter_target_buffer.Get(), nullptr, m_render_target_view.GetAddressOf()));
 
     D3D11_TEXTURE2D_DESC Desc = {};
 
     Desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    Desc.Width = (UINT)m_resolution.x;
-    Desc.Height = (UINT)m_resolution.y;
+    Desc.Width = m_res_width;
+    Desc.Height = m_res_height;
     Desc.ArraySize = 1;
 
     Desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
@@ -139,24 +129,27 @@ void DX11::_2_DXInit_CreateRenderTargetView()
     Desc.SampleDesc.Count = 1;
     Desc.SampleDesc.Quality = 0;
 
-    CHKFAIL(m_device->CreateTexture2D(&Desc, nullptr, DSTex.GetAddressOf()));
-    CHKFAIL(m_device->CreateDepthStencilView(DSTex.Get(), nullptr, DSV.GetAddressOf()));
+    CHKFAIL(m_device->CreateTexture2D(&Desc, nullptr, m_depth_stencil_buffer.GetAddressOf()));
+    CHKFAIL(m_device->CreateDepthStencilView(m_depth_stencil_buffer.Get(), nullptr, m_depth_stencil_view.GetAddressOf()));
 
+    m_viewport.TopLeftX = 0.f;
+    m_viewport.TopLeftY = 0.f;
 
-    ViewPort.TopLeftX = 0.f;
-    ViewPort.TopLeftY = 0.f;
-
-    ViewPort.Width = m_resolution.x;
-    ViewPort.Height = m_resolution.y;
-    ViewPort.MinDepth = 0.f;
-    ViewPort.MaxDepth = 1.f;
+    m_viewport.Width = (FLOAT)m_res_width;
+    m_viewport.Height = (FLOAT)m_res_height;
+    m_viewport.MinDepth = 0.f;
+    m_viewport.MaxDepth = 1.f;
 
     //뷰포트(스크린) 지정
-    m_context->RSSetViewports(1, &ViewPort);
+    m_context->RSSetViewports(1, &m_viewport);
+}
+
+void DX11::create_depth_stencil_view()
+{
 }
 
 
-void DX11::DXInit_CreateRasterizerState()
+void DX11::create_rasterizer_state()
 {
     D3D11_RASTERIZER_DESC rasterDesc = {};
     rasterDesc.FillMode = D3D11_FILL_SOLID;
@@ -170,20 +163,20 @@ void DX11::DXInit_CreateRasterizerState()
 
     rasterDesc.DepthClipEnable = TRUE;
 
-    HRESULT hr = m_device->CreateRasterizerState(&rasterDesc, RSState.GetAddressOf());
+    HRESULT hr = m_device->CreateRasterizerState(&rasterDesc, m_rasterizer_state.GetAddressOf());
 
     CHKFAIL(hr);
 
-    //단일 Rasterizer 사용 예정이므로 등록
-    m_context->RSSetState(RSState.Get());
+    //단일 Rasterizer 사용 예정이므로 한번 등록 후 계속 사용
+    m_context->RSSetState(m_rasterizer_state.Get());
 }
 
-void DX11::_4_DXInit_CreateBlendState()
+void DX11::create_blend_state()
 {
-    BSState = nullptr;
+    m_blend_state = nullptr;
 }
 
-void DX11::_5_DXInit_CreateSampler()
+void DX11::create_sampler()
 {
     D3D11_SAMPLER_DESC SamDesc = {};
 
@@ -191,10 +184,32 @@ void DX11::_5_DXInit_CreateSampler()
     SamDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
     SamDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
     SamDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-    m_device->CreateSamplerState(&SamDesc, Sampler.GetAddressOf());
+    m_device->CreateSamplerState(&SamDesc, m_sampler.GetAddressOf());
 }
 
-void DX11::set_resolution(const Vector2& _size)
+void DX11::set_resolution(UINT _width, UINT _height)
 {
+    m_res_width = _width;
+    m_res_height = _height;
 
+    m_context->OMSetRenderTargets(0u, nullptr, nullptr);
+
+    HRESULT hr = E_FAIL;
+    if (nullptr == m_swapchain)
+    {
+        create_swap_chain();
+        hr = S_OK;
+    }
+    else
+    {
+        // Pass 0 for buffer count to preserve the existing count
+        // Pass 0 for width/height to automatically use the window's new client size
+        // Pass DXGI_FORMAT_UNKNOWN to preserve the existing format
+        hr = m_swapchain->ResizeBuffers(0u, _width, _height, DXGI_FORMAT_UNKNOWN, 0u);
+    }
+
+    CHKFAIL(hr);
+
+    create_render_target_view();
+    create_depth_stencil_view();
 }
