@@ -1,8 +1,14 @@
 #pragma once
 #include "global.h"
 
-class CubeModel;
-class CubeWorld;
+//View Space
+//https://www.notion.so/hyrule1/3D-Graphics-Study-250cb63f18c18074b5dcca4609f4b447?p=254cb63f18c1810cbcb6fbc3d517340d&pm=s
+
+//Clip Space
+//https://www.notion.so/hyrule1/3D-Graphics-Study-250cb63f18c18074b5dcca4609f4b447?p=254cb63f18c180f9bb86f4fbadab0bf9&pm=s
+
+class Model;
+class WorldObj;
 
 class Camera
 {
@@ -15,7 +21,7 @@ public:
 public:
 	void update();
 
-	void render(CubeWorld* _world);
+	void render(WorldObj* _world);
 
 	const Quaternion& get_rotataion() const { return m_rotation; }
 	const Matrix& get_rotation_matrix() const { return m_rot_matrix; }

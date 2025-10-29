@@ -7,8 +7,8 @@
 
 #include "MyMath.h"
 
-#include "CubeModel.h"
-#include "CubeWorld.h"
+#include "Model.h"
+#include "WorldObj.h"
 
 
 Camera::Camera() {}
@@ -78,8 +78,8 @@ void Camera::update()
 	마우스 Y- -> X축 pitch +방향 회전 (역방향: 부호 변환 필요)
 	*/
 		Vector2 dir = input.GetMouseDir() * deltatime * 30.f;
-		m_pitchyaw_degree.x -= dir.y;
-		m_pitchyaw_degree.y += dir.x;
+		m_pitchyaw_degree.x += dir.y;
+		m_pitchyaw_degree.y -= dir.x;
 
 		//pitch clamp( -89 ~ 89 )
 		if (m_pitchyaw_degree.x < -89.f) { m_pitchyaw_degree.x = -89.f; }
@@ -100,8 +100,9 @@ void Camera::update()
 	}
 }
 
-void Camera::render(CubeWorld* _world)
+void Camera::render(WorldObj* _world)
 {
+
 	_world->render(m_view_matrix, m_projection_matrix);
 }
 
@@ -119,6 +120,8 @@ void Camera::on_resolution_change(float _width, float _height)
 	}
 }
 
+//View 행렬에 대한 설명:
+//https://www.notion.so/hyrule1/3D-Graphics-Study-250cb63f18c18074b5dcca4609f4b447?p=26fcb63f18c180aa8406cfc5c90d1217&pm=s
 void Camera::calculate_view_matrix()
 {
 	constexpr int X = 0, Y = 1, Z = 2;
@@ -135,18 +138,16 @@ void Camera::calculate_view_matrix()
 
 	//V = (R * T)^-1 = T^-1 * R ^ -1
 	m_view_matrix = pos_mat_inv * rot_mat_inv;
-
-	//RH -> LH
-	//Z축을 반전시켜주어야 함!
-	//m_view_matrix._31 = -m_view_matrix._31;
-	//m_view_matrix._32 = -m_view_matrix._32;
-	//m_view_matrix._33 = -m_view_matrix._33;
-	//m_view_matrix._34 = -m_view_matrix._34;
 }
 
+//투영행렬의 역할:
+//https://www.notion.so/hyrule1/3D-Graphics-Study-250cb63f18c18074b5dcca4609f4b447?p=28bcb63f18c180b98060d38ba0ea5268&pm=s
 void Camera::calculate_ortho_proj_matrix(float _l, float _r, float _b, float _t)
 {
-	//m_projection_matrix = MyMath::get_orthographic_projection_matrix(m_Z_near, m_Z_far, res.x, res.y);
+	assert(_l < _r);
+	assert(_b < _t);
+
+	m_projection_matrix = MyMath::get_orthographic_projection_matrix(_l, _r, _b, _t);
 }
 
 void Camera::calculate_persp_proj_matrix(float _near, float _far, float _fov_deg, float _aspect_ratio)

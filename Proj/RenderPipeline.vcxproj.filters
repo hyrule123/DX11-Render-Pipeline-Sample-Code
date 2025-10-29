@@ -48,10 +48,10 @@
     <ClInclude Include="settings.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="CubeModel.h">
+    <ClInclude Include="Model.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="CubeWorld.h">
+    <ClInclude Include="WorldObj.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
@@ -89,10 +89,10 @@
     <ClCompile Include="Manager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="CubeModel.cpp">
+    <ClCompile Include="Model.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="CubeWorld.cpp">
+    <ClCompile Include="WorldObj.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">

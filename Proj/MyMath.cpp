@@ -1,5 +1,7 @@
 #include "MyMath.h"
 
+//이 행렬이 유도되는 과정: 
+//https://www.notion.so/hyrule1/3D-Graphics-Study-250cb63f18c18074b5dcca4609f4b447?p=266cb63f18c180eaa934ff0c7e590813&pm=s
 Matrix MyMath::get_rotation_matrix(const Quaternion& _q)
 {
 #define a w //scalar part
@@ -40,6 +42,8 @@ end{bmatrix}
     return rot_mat;
 }
 
+//원근투영행렬 설명:
+//https://www.notion.so/hyrule1/3D-Graphics-Study-250cb63f18c18074b5dcca4609f4b447?p=28acb63f18c1807b815ad96614f30995&pm=s
 Matrix MyMath::get_perspective_projection_matrix(float _n, float _f, float _fovY_deg, float _aspect_ratio)
 {
 	Matrix proj = Matrix::Identity;
@@ -66,6 +70,8 @@ f = \text{far plane}
 	return proj;
 }
 
+//직교 행렬
+//https://www.notion.so/hyrule1/3D-Graphics-Study-250cb63f18c18074b5dcca4609f4b447?p=274cb63f18c180d185b5e933b6f43f9a&pm=s
 Matrix MyMath::get_orthographic_projection_matrix(float _n, float _f, float _width, float _height)
 {
 	Matrix ortho = Matrix::Identity;
@@ -89,6 +95,9 @@ P_{ortho} =
 	return ortho;
 }
 
+
+//직접 회전 사원수 만들기
+//https://www.notion.so/hyrule1/3D-Graphics-Study-250cb63f18c18074b5dcca4609f4b447?p=266cb63f18c18024b37fec68945fbfe4&pm=s
 Quaternion MyMath::get_quaternion(Vector3 _axis, float _radian)
 {
 	Quaternion ret;

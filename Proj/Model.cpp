@@ -1,4 +1,4 @@
-#include "CubeModel.h"
+#include "Model.h"
 
 #include "Manager.h"
 #include "DX11.h"
@@ -6,11 +6,11 @@
 #include "VertexShader.h"
 #include "PixelShader.h"
 
-CubeModel::CubeModel()
+Model::Model()
 {
 }
 
-void CubeModel::init()
+void Model::init()
 {
     create_input_assembler();
     create_shader();
@@ -21,33 +21,25 @@ void CubeModel::init()
 }
 
 
-CubeModel::~CubeModel()
+Model::~Model()
 {
 }
 
-void CubeModel::render(const Matrix& _WVP)
+void Model::render(const Matrix& _WVP)
 {
-    std::vector<Vector4> wvps;
-
-    for (auto& vb : vecVBCube)
-    {
-        Vector4 v = Vector4(vb.vPos, 1.f);
-
-        Vector4 proj = Vector4::Transform(v, _WVP);
-
-        wvps.push_back(proj);
-    }
-
     DX11& dx = Manager::get_inst().get_DX11_inst();
     ComPtr<ID3D11DeviceContext> context = dx.get_context();
 
+    //https://www.notion.so/hyrule1/3D-Graphics-Study-250cb63f18c18074b5dcca4609f4b447?p=254cb63f18c180b1950eea959fa738a9&pm=s
     {
         //입력 조립기에 레이아웃을 등록
         context->IASetInputLayout(InputLayout.Get());
 
+        //쉐이더 설정
         context->VSSetShader(VS.Get(), nullptr, 0);
         context->PSSetShader(PS.Get(), nullptr, 0);
 
+        //폴리곤의 토폴로지 설정
         context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         UINT VBStride = sizeof(Vertex);
         UINT VBOffset = 0;
@@ -65,6 +57,7 @@ void CubeModel::render(const Matrix& _WVP)
         context->VSSetConstantBuffers(0, 1, CB.GetAddressOf());
 
         //그리기 명령(드로우콜)
+        //현재 도형의정점 좌표 정보를 전달한다.
         context->DrawIndexed((UINT)vecIBCube.size(), 0, 0);
     }
 
@@ -85,7 +78,7 @@ void CubeModel::render(const Matrix& _WVP)
     }
 }
 
-void CubeModel::create_input_assembler()
+void Model::create_input_assembler()
 {
     DX11& dx = Manager::get_inst().get_DX11_inst();
     ComPtr<ID3D11Device> device = dx.get_device();
@@ -113,7 +106,7 @@ void CubeModel::create_input_assembler()
     CHKFAIL(device->CreateInputLayout(IADesc, 2, g_VS, sizeof(g_VS), InputLayout.GetAddressOf()));
 }
 
-void CubeModel::create_shader()
+void Model::create_shader()
 {
     DX11& dx = Manager::get_inst().get_DX11_inst();
     ComPtr<ID3D11Device> device = dx.get_device();
@@ -122,7 +115,7 @@ void CubeModel::create_shader()
     CHKFAIL(device->CreatePixelShader(g_PS, sizeof(g_PS), nullptr, &PS));
 }
 
-void CubeModel::create_const_buffer()
+void Model::create_const_buffer()
 {
     DX11& dx = Manager::get_inst().get_DX11_inst();
     ComPtr<ID3D11Device> device = dx.get_device();
@@ -137,7 +130,7 @@ void CubeModel::create_const_buffer()
     CHKFAIL(device->CreateBuffer(&Desc, nullptr, CB.GetAddressOf()));
 }
 
-void CubeModel::create_cube_mesh()
+void Model::create_cube_mesh()
 {
     DX11& dx = Manager::get_inst().get_DX11_inst();
     ComPtr<ID3D11Device> device = dx.get_device();
@@ -195,49 +188,47 @@ void CubeModel::create_cube_mesh()
     CHKFAIL(device->CreateBuffer(&VBDesc, &VtxData, VBCube.GetAddressOf()));
 
     //인덱스 정보 생성
+    //CCW
     UINT arrIB[] = {
-        0, 1, 2,
-        0, 2, 3,
+        0, 2, 1,
+        0, 3, 2,
 
-        1, 5, 6,
-        1, 6, 2,
+        1, 6, 5,
+        1, 2, 6,
 
-        3, 2, 6,
-        3, 6, 7,
+        3, 6, 2,
+        3, 7, 6,
 
-        4, 0, 3,
-        4, 3, 7,
+        4, 3, 0,
+        4, 7, 3,
 
-        4, 5, 1,
-        4, 1, 0,
+        4, 1, 5,
+        4, 0, 1,
 
-        5, 4, 7,
-        5, 7, 6
+        5, 7, 4,
+        5, 6, 7
     };
-    
-    //오른손 좌표계와 왼손 좌표계는 Z축이 반전되어 있다
-    //따라서 외적의 결과도 반대 방향이 되어야 하므로 index 순서를 시계 방향에서 반시계 방향으로 교체한다.
-    /*
-    UINT arrIB[] = {
-    0, 2, 1,
-    0, 3, 2,
 
-    1, 6, 5,
-    1, 2, 6,
+    //CW
+    //UINT arrIB[] = {
+    //    0, 1, 2,
+    //    0, 2, 3,
 
-    3, 6, 2,
-    3, 7, 6,
+    //    1, 5, 6,
+    //    1, 6, 2,
 
-    4, 3, 0,
-    4, 7, 3,
+    //    3, 2, 6,
+    //    3, 6, 7,
 
-    4, 1, 5,
-    4, 0, 1,
+    //    4, 0, 3,
+    //    4, 3, 7,
 
-    5, 7, 4,
-    5, 6, 7
-    };
-    */
+    //    4, 5, 1,
+    //    4, 1, 0,
+
+    //    5, 4, 7,
+    //    5, 7, 6
+    //};
 
     vecIBCube.insert(vecIBCube.begin(), arrIB, arrIB + 36);
 
@@ -254,7 +245,7 @@ void CubeModel::create_cube_mesh()
     CHKFAIL(device->CreateBuffer(&IBDesc, &IdxData, IBCube.GetAddressOf()));
 }
 
-void CubeModel::create_pyramid_mesh()
+void Model::create_pyramid_mesh()
 {
     DX11& dx = Manager::get_inst().get_DX11_inst();
     ComPtr<ID3D11Device> device = dx.get_device();
@@ -294,38 +285,29 @@ void CubeModel::create_pyramid_mesh()
 
     CHKFAIL(device->CreateBuffer(&VBDesc, &VtxData, VBCube.GetAddressOf()));
 
-    //인덱스 정보 생성
-    
-    //UINT arrIB[] = { 
-    //    0, 1, 2,
-    //    0, 2, 3,
-    //    0, 3, 1,
-    //    1, 3, 2
-    //};
-
+    /*
+    //인덱스 정보 생성(CCW)
     UINT arrIB[] = {
-    0, 2, 1,
-    0, 3, 2,
-    0, 1, 3,
-    1, 2, 3
+        0, 1, 2,
+        0, 2, 3,
+        0, 3, 1,
+        1, 3, 2
     };
+*/
+
     
-    Vector3 V1 = Vector3(0.5, 0, 1);
-    Vector3 V2 = Vector3(0, 0, 1);
-    Vector3 V3 = Vector3(0, 1, 1);
-
-    Vector3 l1 = V2 - V1;
-    Vector3 l2 = V3 - V2;
-    Vector3 cross = l1.Cross(l2);
-
-    //오른손 좌표계와 왼손 좌표계는 Z축이 반전되어 있다
-    //따라서 외적의 결과도 반대 방향이 되어야 하므로 index 순서를 시계 방향에서 반시계 방향으로 교체한다.
-    //UINT arrIB[] = {
-    //    0, 2, 1,
-    //    0, 3, 2,
-    //    0, 1, 3,
-    //    3, 1, 2
-    //};
+/*
+* Backface Culling 문제
+https://www.notion.so/hyrule1/3D-Graphics-Study-250cb63f18c18074b5dcca4609f4b447?p=294cb63f18c1808490a7e9cc438ea509&pm=s
+https://www.notion.so/hyrule1/3D-Graphics-Study-250cb63f18c18074b5dcca4609f4b447?p=282cb63f18c180b49f2ccd020bab3319&pm=s
+Model의 정점 순서를 바꿔서 외적 방향을 반대로 변경한다. (CCW -> CW)
+*/
+    UINT arrIB[] = {
+        0, 2, 1,
+        0, 3, 2,
+        0, 1, 3,
+        1, 2, 3
+    };
 
     vecIBCube.insert(vecIBCube.begin(), arrIB, arrIB + (sizeof(arrIB) / sizeof(UINT)));
 
@@ -342,7 +324,7 @@ void CubeModel::create_pyramid_mesh()
     CHKFAIL(device->CreateBuffer(&IBDesc, &IdxData, IBCube.GetAddressOf()));
 }
 
-void CubeModel::create_axis_mesh()
+void Model::create_axis_mesh()
 {
     DX11& dx = Manager::get_inst().get_DX11_inst();
     ComPtr<ID3D11Device> device = dx.get_device();

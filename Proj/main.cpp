@@ -53,6 +53,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_RENDERPIPELINE));
 
+    //Manager 초기화
     Manager::get_inst().init();
 
     MSG msg;

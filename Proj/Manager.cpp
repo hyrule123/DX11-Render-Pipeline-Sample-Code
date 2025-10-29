@@ -53,6 +53,7 @@ void Manager::set_winsize(UINT _width, UINT _height)
 	SetWindowPos(g_hWnd, nullptr, 100, 100, WINSIZE.right - WINSIZE.left, WINSIZE.bottom - WINSIZE.top, 0);
 	ShowWindow(g_hWnd, true);
 
+	//해상도 조절
 	m_dx->set_resolution(m_width, m_height);
 	m_scene->on_resolution_change(m_width, m_height);
 }

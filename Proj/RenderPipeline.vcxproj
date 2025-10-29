@@ -182,8 +182,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="CubeModel.h" />
-    <ClInclude Include="CubeWorld.h" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="WorldObj.h" />
     <ClInclude Include="DX11.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="MyMath.h" />
@@ -201,8 +201,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="CubeModel.cpp" />
-    <ClCompile Include="CubeWorld.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="WorldObj.cpp" />
     <ClCompile Include="DX11.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="MyMath.cpp" />

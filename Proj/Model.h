@@ -2,13 +2,13 @@
 
 #include "global.h"
 
-class CubeModel
+class Model
 {
 public:
-	CubeModel();
+	Model();
 	void init();
 
-	~CubeModel();
+	~Model();
 
 	void render(const Matrix& _WVP);
 

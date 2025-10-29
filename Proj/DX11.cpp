@@ -158,7 +158,7 @@ void DX11::create_rasterizer_state()
 
     //이 부분!!
     //앞 부분이 CW인지 CCW인지 정의
-    rasterDesc.FrontCounterClockwise = FALSE;
+    rasterDesc.FrontCounterClockwise = TRUE;
     // -----------------
 
     rasterDesc.DepthClipEnable = TRUE;

@@ -19,7 +19,6 @@ bool TextRenderer::init()
 	HRESULT result = FW1CreateFactory(FW1_VERSION, &m_FW1_factory);
 
 	//auto device = 
-
 	//result = m_FW1_factory->CreateFontWrapper(device.Get(), L"Arial", &m_font_wrapper);
 
 	return false;

@@ -1,4 +1,4 @@
-#include "CubeWorld.h"
+#include "WorldObj.h"
 
 #include "MyMath.h"
 
@@ -8,21 +8,21 @@
 #include "Scene.h"
 
 #include "Camera.h"
-#include "CubeModel.h"
+#include "Model.h"
 
-CubeWorld::CubeWorld() {}
+WorldObj::WorldObj() {}
 
-void CubeWorld::init()
+void WorldObj::init()
 {
 	m_scale = Vector3(50.f, 50.f, 50.f);
 }
 
-CubeWorld::~CubeWorld()
+WorldObj::~WorldObj()
 {
 
 }
 
-void CubeWorld::update()
+void WorldObj::update()
 {
     Manager& manager = Manager::get_inst();
     Input& input = manager.get_Input_inst();
@@ -36,6 +36,7 @@ void CubeWorld::update()
     }
 
     //크기
+    //https://www.notion.so/hyrule1/3D-Graphics-Study-250cb63f18c18074b5dcca4609f4b447?p=254cb63f18c180a282bbcb1c7cc2a16a&pm=s
     Matrix scale_mat = Matrix::Identity;
 
     scale_mat.m[0][0] = m_scale.x;
@@ -56,13 +57,13 @@ void CubeWorld::update()
     m_world_mat = scale_mat * rot_mat * trans_mat;
 }
 
-void CubeWorld::render(const Matrix& _view_mat, const Matrix& _proj_mat)
+void WorldObj::render(const Matrix& _view_mat, const Matrix& _proj_mat)
 {
     Matrix WVP = m_world_mat * _view_mat * _proj_mat;
-    m_model->render(WVP);
+    m_model_obj->render(WVP);
 }
 
-void CubeWorld::rotate_by_cam_view(Camera* _cam, Vector2 _mouse_dir, float _deltatime)
+void WorldObj::rotate_by_cam_view(Camera* _cam, Vector2 _mouse_dir, float _deltatime)
 {
     if (nullptr == _cam) { return; }
 
