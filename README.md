@@ -6,5 +6,4 @@
 * 이 프로젝트에서 프로그래밍은 이론 및 계산 결과에 대한 검증용으로 사용한다.
   * 만약 계산 결과가 잘못되었다면 프로그램에서 정상적으로 출력되지 않을 것이다.
  
-### 이론 정리 글 링크
-[🔗노션 링크](https://www.notion.so/hyrule1/3D-Graphics-Study-250cb63f18c18074b5dcca4609f4b447)
+### [🔗Notion - 📝3D 그래픽스 이론 정리](https://www.notion.so/hyrule1/3D-Graphics-Study-250cb63f18c18074b5dcca4609f4b447)
